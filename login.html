@@ -1,2 +1,129 @@
 <!DOCTYPE html>
-<html lang="ar
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول | Kids Learning Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .login-card {
+            background: white;
+            padding: 40px;
+            border-radius: 40px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            border-bottom: 10px solid #dfe6e9;
+        }
+        .input-field {
+            width: 100%;
+            padding: 15px 25px;
+            margin-bottom: 20px;
+            border: 3px solid #eee;
+            border-radius: 20px;
+            font-size: 1.1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .input-field:focus {
+            border-color: #6c5ce7;
+        }
+        .btn-login {
+            background: #ff7675;
+            color: white;
+            width: 100%;
+            padding: 15px;
+            border-radius: 20px;
+            font-size: 1.3rem;
+            font-weight: 900;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 8px 0 #d63031;
+            transition: all 0.2s;
+        }
+        .btn-login:active {
+            transform: translateY(4px);
+            box-shadow: 0 4px 0 #d63031;
+        }
+        .emoji-header {
+            font-size: 5rem;
+            margin-bottom: 10px;
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="emoji-header">🌟</div>
+        <h1 class="text-3xl font-black text-slate-800 mb-2">مرحباً بك مجدداً!</h1>
+        <p class="text-slate-500 font-bold mb-8">سجل دخولك لتبدأ المغامرة</p>
+
+        <form id="loginForm">
+            <input type="email" id="email" placeholder="البريد الإلكتروني" class="input-field text-center" required>
+            <input type="password" id="password" placeholder="كلمة المرور" class="input-field text-center" required>
+            
+            <button type="submit" class="btn-login mb-6">دخول 🚀</button>
+        </form>
+
+        <p class="text-slate-600 font-bold">
+            ليس لديك حساب؟ 
+            <a href="register-fixed.html" class="text-rose-500 hover:underline">اضغط هنا للتسجيل ✨</a>
+        </p>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').onsubmit = function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            // تجربة الدخول (test account)
+            if (email === 'test@test.com' && password === '123') {
+                if (!localStorage.getItem('kidsUser')) {
+                    localStorage.setItem('kidsUser', JSON.stringify({
+                        parentName: 'ولي الأمر',
+                        parentEmail: 'test@test.com',
+                        childName: 'البطل الصغير',
+                        childAge: 5
+                    }));
+                }
+                window.location.href = 'child-dashboard.html';
+            } else {
+                // التأكد من الحسابات المسجلة سابقاً
+                const savedUser = JSON.parse(localStorage.getItem('kidsUser') || '{}');
+                if (savedUser.parentEmail === email) {
+                    window.location.href = 'child-dashboard.html';
+                } else {
+                    alert('خطأ في البريد أو كلمة المرور! (جرب test@test.com / 123)');
+                }
+            }
+        };
+
+        function speak(text) {
+            window.speechSynthesis.cancel();
+            const msg = new SpeechSynthesisUtterance(text);
+            msg.lang = 'ar-SA';
+            window.speechSynthesis.speak(msg);
+        }
+
+        window.onload = () => {
+            setTimeout(() => speak("أهلاً بك مجدداً.. سجل دخولك لتبدأ المغامرة"), 500);
+        };
+    </script>
+</body>
+</html>
