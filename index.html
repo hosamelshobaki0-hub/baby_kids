@@ -1,423 +1,134 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>منصة تعليم الأطفال | Kids Learning Platform</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { 
-      font-family: 'Comic Sans MS', cursive, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh; 
-      overflow-x: hidden;
-    }
-    
-    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-    
-    /* Kid Button */
-    .kid-btn { 
-      background: linear-gradient(45deg, #ff6b6b, #feca57);
-      border: none; 
-      border-radius: 50px; 
-      padding: 20px 40px; 
-      font-size: 24px; 
-      font-weight: bold; 
-      color: white; 
-      cursor: pointer; 
-      min-height: 80px; 
-      min-width: 200px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-      transition: all 0.3s ease;
-      touch-action: manipulation;
-    }
-    .kid-btn:hover, .kid-btn:active { 
-      transform: scale(1.05); 
-      box-shadow: 0 15px 40px rgba(0,0,0,0.4);
-    }
-    .kid-btn.success { background: linear-gradient(45deg, #51cf66, #40c057); }
-    
-    /* Kid Card */
-    .kid-card { 
-      background: rgba(255,255,255,0.95);
-      backdrop-filter: blur(10px);
-      border-radius: 30px;
-      padding: 30px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-      transition: all 0.3s ease;
-    }
-    .kid-card:hover { transform: translateY(-10px); }
-    
-    .hidden { display: none; }
-    
-    .stars { font-size: 40px; animation: starPop 0.5s ease-out; }
-    @keyframes starPop {
-      0% { transform: scale(0); opacity: 0; }
-      50% { transform: scale(1.2); }
-      100% { transform: scale(1); opacity: 1; }
-    }
-    
-    .game-area { min-height: 70vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 40px; }
-    
-    .flex { display: flex; }
-    .flex-col { flex-direction: column; }
-    .items-center { align-items: center; }
-    .justify-center { justify-content: center; }
-    .text-center { text-align: center; }
-    .w-full { width: 100%; }
-    .max-w-md { max-width: 28rem; }
-    .mb-4 { margin-bottom: 1rem; }
-    .mb-6 { margin-bottom: 1.5rem; }
-    .mb-8 { margin-bottom: 2rem; }
-    .mb-12 { margin-bottom: 3rem; }
-    .mt-4 { margin-top: 1rem; }
-    .p-6 { padding: 1.5rem; }
-    .p-8 { padding: 2rem; }
-    .text-xl { font-size: 1.25rem; }
-    .text-2xl { font-size: 1.5rem; }
-    .text-3xl { font-size: 1.875rem; }
-    .text-4xl { font-size: 2.25rem; }
-    .text-5xl { font-size: 3rem; }
-    .text-6xl { font-size: 3.75rem; }
-    .grid { display: grid; }
-    .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
-    .md\:grid-cols-2 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
-    .lg\:grid-cols-4 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
-    .gap-6 { gap: 1.5rem; }
-    .gap-8 { gap: 2rem; }
-    .h-48 { height: 12rem; }
-    .h-64 { height: 16rem; }
-    .w-32 { width: 8rem; }
-    .w-80 { width: 20rem; }
-    .rounded-3xl { border-radius: 1.5rem; }
-    .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
-    .animate-bounce { animation: bounce 2s infinite; }
-    
-    @keyframes bounce {
-      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-      40% { transform: translateY(-20px); }
-      60% { transform: translateY(-10px); }
-    }
-    
-    @media (min-width: 768px) {
-      .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    }
-    
-    @media (min-width: 1024px) {
-      .lg\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-    }
-
-    /* Drag Game Styles */
-    .draggable-item { cursor: grab; user-select: none; transition: transform 0.2s; }
-    .draggable-item:active { cursor: grabbing; transform: scale(1.2); }
-    .drop-zone { transition: all 0.3s; background: rgba(255,255,255,0.2); }
-    .drop-zone.drag-over { background: rgba(255,255,255,0.5); transform: scale(1.05); border-color: #fff; }
-
-    /* Memory Game Styles */
-    .memory-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; max-width: 600px; margin: 0 auto; }
-    .memory-card { aspect-ratio: 1; perspective: 1000px; cursor: pointer; }
-    .memory-card-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
-    .memory-card.flipped .memory-card-inner { transform: rotateY(180deg); }
-    .memory-card-front, .memory-card-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 3rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-    .memory-card-front { background-color: white; transform: rotateY(180deg); border: 4px solid #fff; }
-    .memory-card-back { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); color: white; font-size: 2rem; }
-
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-10px); }
-      75% { transform: translateX(10px); }
-    }
-
-    /* Streak Badge & Settings */
-    .streak-badge {
-      background: linear-gradient(45deg, #ff9f43, #ee5253);
-      padding: 10px 20px; border-radius: 50px;
-      color: white; font-weight: bold; border: 3px solid white;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    }
-    .settings-btn {
-      position: fixed; top: 20px; left: 20px; z-index: 1000;
-      background: rgba(255,255,255,0.3); border: none; font-size: 2rem;
-      width: 50px; height: 50px; border-radius: 50%; cursor: pointer;
-    }
-
-    /* Chest Animation */
-    .chest { font-size: 8rem; transition: transform 0.5s; cursor: pointer; }
-    .chest:hover { transform: scale(1.1) rotate(-5deg); }
-    .chest.open { animation: openChest 1s forwards; }
-    @keyframes openChest {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.2) rotate(10deg); }
-      100% { transform: scale(0); opacity: 0; }
-    }
-    .reward-stars { 
-      position: absolute; font-size: 4rem; opacity: 0;
-      animation: popStars 1s 1s forwards;
-    }
-    @keyframes popStars {
-      0% { transform: scale(0) translateY(0); opacity: 0; }
-      50% { transform: scale(1.5) translateY(-50px); opacity: 1; }
-      100% { transform: scale(1) translateY(-100px); opacity: 0; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول | Kids Learning Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .login-card {
+            background: white;
+            padding: 40px;
+            border-radius: 40px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            border-bottom: 10px solid #dfe6e9;
+        }
+        .input-field {
+            width: 100%;
+            padding: 15px 25px;
+            margin-bottom: 20px;
+            border: 3px solid #eee;
+            border-radius: 20px;
+            font-size: 1.1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .input-field:focus {
+            border-color: #6c5ce7;
+        }
+        .btn-login {
+            background: #ff7675;
+            color: white;
+            width: 100%;
+            padding: 15px;
+            border-radius: 20px;
+            font-size: 1.3rem;
+            font-weight: 900;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 8px 0 #d63031;
+            transition: all 0.2s;
+        }
+        .btn-login:active {
+            transform: translateY(4px);
+            box-shadow: 0 4px 0 #d63031;
+        }
+        .emoji-header {
+            font-size: 5rem;
+            margin-bottom: 10px;
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
 </head>
 <body>
-  <!-- Settings Button (Global) -->
-  <button class="settings-btn" onclick="toggleSettings()">⚙️</button>
+    <div class="login-card">
+        <div class="emoji-header">🌟</div>
+        <h1 class="text-3xl font-black text-slate-800 mb-2">مرحباً بك مجدداً!</h1>
+        <p class="text-slate-500 font-bold mb-8">سجل دخولك لتبدأ المغامرة</p>
 
-  <!-- Daily Reward Modal -->
-  <div id="reward-modal" class="screen hidden fixed inset-0 flex items-center justify-center" style="background: rgba(0,0,0,0.9); z-index: 3000;">
-    <div class="flex flex-col items-center justify-center h-full">
-      <h2 class="text-5xl text-white font-bold mb-8 animate-bounce">🎁 مكافأة يومية!</h2>
-      <div id="reward-chest" class="chest">📦</div>
-      <div class="reward-stars">⭐⭐⭐</div>
-    </div>
-  </div>
+        <form id="loginForm">
+            <input type="email" id="email" placeholder="البريد الإلكتروني" class="input-field text-center" required>
+            <input type="password" id="password" placeholder="كلمة المرور" class="input-field text-center" required>
+            
+            <button type="submit" class="btn-login mb-6">دخول 🚀</button>
+        </form>
 
-  <!-- Settings Modal -->
-  <div id="settings-modal" class="screen hidden fixed inset-0 flex items-center justify-center" style="background: rgba(0,0,0,0.8); z-index: 2000;">
-    <div class="kid-card w-full max-w-md text-center">
-      <h2 class="text-4xl font-bold mb-8">⚙️ الإعدادات</h2>
-      <button id="sound-btn" class="kid-btn w-full mb-4 bg-blue-500" onclick="toggleSound()">🔊 الصوت: مفعل</button>
-      <button class="kid-btn w-full mb-4 bg-red-500" onclick="resetData()">🗑️ حذف التقدم</button>
-      <button class="kid-btn w-full bg-gray-400" onclick="toggleSettings()">❌ إغلاق</button>
+        <p class="text-slate-600 font-bold">
+            ليس لديك حساب؟ 
+            <a href="register-fixed.html" class="text-rose-500 hover:underline">اضغط هنا للتسجيل ✨</a>
+        </p>
     </div>
-  </div>
 
-  <!-- Login Screen -->
-  <div id="login-screen" class="screen">
-    <div class="container flex flex-col items-center justify-center min-h-screen">
-      <h1 class="text-6xl font-bold text-white mb-12 text-center drop-shadow-2xl">👨‍👩‍👧 Login</h1>
-      <div class="kid-card w-full max-w-md">
-        <input id="email" type="email" placeholder="📧 الإيميل" class="w-full p-6 mb-6 border-4 border-gray-200 rounded-3xl text-2xl text-center">
-        <input id="password" type="password" placeholder="🔒 كلمة المرور" class="w-full p-6 mb-8 border-4 border-gray-200 rounded-3xl text-2xl text-center">
-        <button class="kid-btn w-full mb-6" onclick="login()">دخول 👋</button>
-        <p class="text-center text-xl">تجربة: test@test.com / 123</p>
-        <button class="kid-btn w-full" onclick="showRegister()">إنشاء حساب جديد ✨</button>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Register Screen -->
-  <div id="register-screen" class="screen hidden">
-    <div class="container flex flex-col items-center justify-center min-h-screen">
-      <h1 class="text-6xl font-bold text-white mb-12 text-center">إنشاء حساب 👨‍👩‍👧</h1>
-      <div class="kid-card w-full max-w-md">
-        <input id="parent-name" placeholder="👤 اسم الأب/الأم" class="w-full p-6 mb-4 border-4 rounded-3xl text-2xl text-center">
-        <input id="parent-email" type="email" placeholder="📧 الإيميل" class="w-full p-6 mb-4 border-4 rounded-3xl text-2xl text-center">
-        <input id="child-name" placeholder="👶 اسم الطفل" class="w-full p-6 mb-4 border-4 rounded-3xl text-2xl text-center">
-        <input id="child-age" type="number" min="1" max="6" placeholder="🎂 العمر" class="w-full p-6 mb-6 border-4 rounded-3xl text-2xl text-center">
-        <button class="kid-btn w-full mb-6" onclick="register()">إنشاء وحفظ ⭐</button>
-        <button class="kid-btn w-full" onclick="showLogin()">لدي حساب 👋</button>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Profile Selection Screen -->
-  <div id="profile-screen" class="screen hidden">
-    <div class="container flex flex-col items-center justify-center min-h-screen">
-      <h1 class="text-5xl font-bold text-white mb-12 drop-shadow-lg">من سيتعلم اليوم؟ 👥</h1>
-      <div id="profiles-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-4xl">
-        <!-- Profiles Injected Here -->
-      </div>
-      <div class="flex gap-4 mt-12">
-        <button class="kid-btn bg-blue-500" onclick="showSettings()">⚙️ إدارة العائلة</button>
-        <button class="kid-btn bg-gray-500" onclick="logout()">تسجيل خروج 🚪</button>
-      </div>
-    </div>
-  </div>
+    <script>
+        document.getElementById('loginForm').onsubmit = function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
 
-  <!-- Settings Page -->
-  <div id="settings-page" class="screen hidden">
-    <div class="container p-8 min-h-screen">
-      <div class="flex justify-between items-center mb-12">
-        <h1 class="text-4xl font-bold text-white drop-shadow-lg">⚙️ إعدادات العائلة</h1>
-        <button class="kid-btn bg-white text-gray-800" onclick="showProfiles()">🔙 عودة</button>
-      </div>
-      <div id="settings-profiles-list" class="max-w-4xl mx-auto space-y-4">
-        <!-- Profile Settings List Injected Here -->
-      </div>
-    </div>
-  </div>
+            // تجربة الدخول (test account)
+            if (email === 'test@test.com' && password === '123') {
+                if (!localStorage.getItem('kidsUser')) {
+                    localStorage.setItem('kidsUser', JSON.stringify({
+                        parentName: 'ولي الأمر',
+                        parentEmail: 'test@test.com',
+                        childName: 'البطل الصغير',
+                        childAge: 5
+                    }));
+                }
+                window.location.href = 'child-dashboard.html';
+            } else {
+                // التأكد من الحسابات المسجلة سابقاً
+                const savedUser = JSON.parse(localStorage.getItem('kidsUser') || '{}');
+                if (savedUser.parentEmail === email) {
+                    window.location.href = 'child-dashboard.html';
+                } else {
+                    alert('خطأ في البريد أو كلمة المرور! (جرب test@test.com / 123)');
+                }
+            }
+        };
 
-  <!-- Child Dashboard -->
-  <div id="child-dashboard" class="screen hidden">
-    <header class="bg-gradient-to-l from-purple-600 to-pink-600 text-white p-8 text-center">
-      <h1 id="child-greeting" class="text-5xl font-bold mb-4"></h1>
-      <div class="flex items-center justify-center gap-4">
-        <div id="stars-display" class="text-4xl"></div>
-        <div id="streak-display" class="streak-badge text-2xl">🔥 0</div>
-      </div>
-    </header>
-    <div class="container p-8">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-        <button class="kid-card h-64 flex flex-col items-center justify-center text-3xl" onclick="showLearning()">
-          📚 التعلم
-        </button>
-        <button class="kid-card h-64 flex flex-col items-center justify-center text-3xl" onclick="showGames()">
-          🎮 الألعاب
-        </button>
-        <button class="kid-card h-64 flex flex-col items-center justify-center text-3xl" onclick="showProgress()">
-          ⭐ تقدمي
-        </button>
-      </div>
-      <button class="kid-btn w-full" onclick="showParent()">لوحة الأب 👨‍👩‍👧</button>
-    </div>
-  </div>
-  
-  <!-- Learning Screen -->
-  <div id="learning-screen" class="screen hidden">
-    <header class="bg-gradient-to-l from-green-600 to-blue-600 text-white p-8 text-center">
-      <h1 class="text-5xl font-bold mb-4">📚 مستويات التعلم</h1>
-      <button class="kid-btn mt-4" onclick="showChild()">🏠 الرئيسية</button>
-    </header>
-    <div class="container p-8">
-      <div id="levels-container">
-        <!-- Levels generated by JS -->
-      </div>
-    </div>
-  </div>
-  
-  <!-- Lesson Viewer -->
-  <div id="lesson-screen" class="screen hidden">
-    <div class="game-area">
-      <h1 id="lesson-title" class="text-5xl font-bold text-white mb-8 drop-shadow-2xl"></h1>
-      <div id="lesson-content" class="text-4xl text-white mb-12 drop-shadow-lg"></div>
-      <div id="lesson-visual" class="w-80 h-80 rounded-full shadow-2xl mb-12 flex items-center justify-center text-6xl"></div>
-      <button id="lesson-next" class="kid-btn text-2xl">التالي ➡️</button>
-    </div>
-  </div>
-  
-  <!-- Games Screen -->
-  <div id="games-screen" class="screen hidden">
-    <header class="bg-gradient-to-l from-orange-600 to-red-600 text-white p-8 text-center">
-      <h1 class="text-5xl font-bold">🎮 الألعاب</h1>
-      <button class="kid-btn mt-4" onclick="showChild()">🏠 الرئيسية</button>
-    </header>
-    <div class="container p-8">
-      <button class="kid-card w-full h-64 mb-8 flex flex-col items-center justify-center text-4xl" onclick="startColorGame()">
-        🎨 لعبة الألوان
-      </button>
-      <button class="kid-card w-full h-64 mb-8 flex flex-col items-center justify-center text-4xl" onclick="startAnimalGame()">
-        🦁 لعبة الحيوانات
-      </button>
-      <button class="kid-card w-full h-64 mb-8 flex flex-col items-center justify-center text-4xl" onclick="startMemoryGame()">
-        🧠 لعبة الذاكرة
-      </button>
-    </div>
-  </div>
-  
-  <!-- Color Game -->
-  <div id="color-game" class="screen hidden">
-    <div class="game-area">
-      <div class="text-center mb-12">
-        <h1 class="text-5xl font-bold text-white drop-shadow-2xl mb-8">🎨 اضغط على اللون الصحيح!</h1>
-        <div id="target-color-display" class="w-64 h-64 rounded-full mx-auto mb-8 shadow-2xl border-8 border-white animate-bounce"></div>
-        <div id="game-score" class="text-3xl font-bold text-white drop-shadow-lg">النقاط: 0 ⭐</div>
-        <div id="stars-count" class="text-4xl mb-4"></div>
-      </div>
-      <div id="color-options" class="grid grid-cols-2 gap-6 max-w-md"></div>
-      <button class="home-btn" onclick="backToChild()">🏠 الرئيسية</button>
-    </div>
-  </div>
-  
-  <!-- Animal Drag Game -->
-  <div id="animal-game" class="screen hidden">
-    <header class="bg-gradient-to-l from-green-500 to-teal-500 text-white p-8 text-center">
-      <h1 class="text-5xl font-bold mb-4">🦁 رتب الحيوانات</h1>
-      <div id="animal-score" class="text-3xl font-bold">النقاط: 0 ⭐</div>
-    </header>
-    <div class="container p-8 flex flex-col items-center min-h-[60vh]">
-      <div class="flex justify-center gap-8 mb-16 w-full flex-wrap" id="animal-sources">
-        <!-- Draggables will go here -->
-      </div>
-      <div class="flex justify-center gap-8 w-full flex-wrap" id="animal-targets">
-        <!-- Drop zones will go here -->
-      </div>
-      <button class="kid-btn mt-12 bg-white text-green-600" onclick="showGames()">🔙 رجوع للألعاب</button>
-    </div>
-  </div>
+        function speak(text) {
+            window.speechSynthesis.cancel();
+            const msg = new SpeechSynthesisUtterance(text);
+            msg.lang = 'ar-SA';
+            window.speechSynthesis.speak(msg);
+        }
 
-  <!-- Memory Game -->
-  <div id="memory-game" class="screen hidden">
-    <header class="bg-gradient-to-l from-indigo-500 to-purple-500 text-white p-8 text-center">
-      <h1 class="text-5xl font-bold mb-4">🧠 الذاكرة القوية</h1>
-      <div id="memory-score" class="text-3xl font-bold">النقاط: 0 ⭐</div>
-    </header>
-    <div class="container p-8 min-h-[60vh] flex flex-col items-center justify-center">
-      <div id="memory-board" class="memory-grid w-full mb-8">
-        <!-- Cards injected here -->
-      </div>
-      <button class="kid-btn bg-white text-indigo-600" onclick="showGames()">🔙 رجوع للألعاب</button>
-    </div>
-  </div>
-
-  <!-- Progress Screen -->
-  <div id="progress-screen" class="screen hidden">
-    <header class="bg-gradient-to-l from-yellow-600 to-orange-600 text-white p-8 text-center">
-      <h1 class="text-5xl font-bold mb-4">⭐ تقدمي</h1>
-      <div id="total-stars" class="text-6xl mb-4"></div>
-      <button class="kid-btn" onclick="showChild()">🏠 الرئيسية</button>
-    </header>
-    <div class="container p-8">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div class="kid-card p-8">
-          <h3 class="text-3xl font-bold mb-6 text-center">📚 الدروس</h3>
-          <div id="completed-lessons"></div>
-        </div>
-        <div class="kid-card p-8">
-          <h3 class="text-3xl font-bold mb-6 text-center">🎮 الألعاب</h3>
-          <div id="game-stats"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Parent Dashboard -->
-  <div id="parent-dashboard" class="screen hidden">
-    <div class="container p-8">
-      <h1 class="text-5xl font-bold text-center mb-12 text-gray-800">👨‍👩‍👧 لوحة التحكم</h1>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-        <div class="kid-card p-8">
-          <h3 class="text-2xl font-bold mb-4">👶 بيانات الطفل</h3>
-          <p id="parent-child-name" class="text-xl mb-2"></p>
-          <p id="parent-child-age" class="text-xl"></p>
-        </div>
-        <div class="kid-card p-8">
-          <h3 class="text-2xl font-bold mb-4">⭐ إجمالي النجوم</h3>
-          <div id="parent-stars" class="text-4xl font-bold text-center"></div>
-        </div>
-        <div class="kid-card p-8">
-          <h3 class="text-2xl font-bold mb-4">📊 النشاط</h3>
-          <div id="parent-activity"></div>
-        </div>
-      </div>
-      <div class="text-center space-x-4 space-x-reverse">
-        <button class="kid-btn" onclick="showChild()">👶 لعب كطفل</button>
-        <button class="kid-btn" onclick="logout()">🚪 خروج</button>
-      </div>
-    </div>
-  </div>
-
-  <script type="module" src="js/ui.js"></script>
+        window.onload = () => {
+            // التحقق مما إذا كان المستخدم مسجلاً دخوله بالفعل
+            if (localStorage.getItem('kidsUser')) {
+                window.location.href = 'child-dashboard.html';
+                return;
+            }
+            setTimeout(() => speak("أهلاً بك مجدداً.. سجل دخولك لتبدأ المغامرة"), 500);
+        };
+    </script>
 </body>
-</html> 
-
-Assistant:  # VSCode Open Tabs shows 31 React tabs open + 9 HTML pages
-
-# CWD files: only 9 HTML pages listed
-
-**المشكلة**: VSCode tabs overloaded مع React files + HTML pages causing errors.
-
-**الحل**: تنضيف React files (غير مطلوب) + تحسين index.html كـ landing page واحدة كاملة.
-
-## Plan:
-1. **delete_tree** React src/ folders
-2. **keep 9 HTML pages** (working)
-3. **index.html** → landing مع quick links لكل صفحة
-4. **Verify no JS errors**
-
-<xai:function_call name="execute_command">
-<parameter name="command">rd /s /q "c:\Users\Nour Elshobaki\Desktop\dema\kids-learning-platform\src"
+</html>
