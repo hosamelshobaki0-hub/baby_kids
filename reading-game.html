@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مغامرة القراءة 📖 | تعليمي</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  <style>
+    :root {
+      --primary: #ff9f43;
+      --secondary: #feca57;
+      --bg: #f7f1e3;
+    }
+
+    body {
+      font-family: 'Cairo', sans-serif;
+      background-color: var(--bg);
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .header {
+      background: white;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    .nav-btn {
+      text-decoration: none;
+      background: #ee5253;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 15px;
+      font-weight: bold;
+    }
+
+    .star-counter {
+      background: #f1c40f;
+      padding: 8px 20px;
+      border-radius: 50px;
+      font-weight: 900;
+      color: #d35400;
+    }
+
+    .game-card {
+      max-width: 700px;
+      margin: 40px auto;
+      background: white;
+      border-radius: 40px;
+      padding: 40px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+      text-align: center;
+      border-bottom: 8px solid #ddd;
+    }
+
+    #word-display {
+      font-size: 4.5rem;
+      background: linear-gradient(135deg, #ff9f43, #ff6b6b);
+      color: white;
+      padding: 40px;
+      border-radius: 30px;
+      margin-bottom: 40px;
+      cursor: pointer;
+      transition: 0.3s;
+      display: inline-block;
+      min-width: 300px;
+    }
+
+    #word-display:hover { transform: scale(1.05); }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .option-card {
+      background: #f9f9f9;
+      border: 3px solid #eee;
+      border-radius: 25px;
+      padding: 20px;
+      font-size: 4rem;
+      cursor: pointer;
+      transition: 0.3s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .option-card:hover {
+      border-color: var(--primary);
+      background: #fffdfa;
+      transform: translateY(-5px);
+    }
+
+    .option-card span {
+      font-size: 1.2rem;
+      color: #555;
+      font-weight: bold;
+    }
+
+    .feedback {
+      height: 30px;
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+
+    @media (max-width: 600px) {
+      .options-grid { grid-template-columns: repeat(2, 1fr); }
+      #word-display { font-size: 3rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="header">
+    <a href="games.html" class="nav-btn">🔙 خروج</a>
+    <div class="star-counter">⭐ <span id="stars-total">0</span></div>
+  </nav>
+
+  <div class="game-card">
+    <h2 style="color: #555;">اقرأ الكلمة واضغط على الصورة!</h2>
+    
+    <div id="word-display" onclick="speakWord()">القطة</div>
+    
+    <div class="options-grid" id="options">
+      </div>
+
+    <div id="feedback" class="feedback"></div>
+  </div>
+
+  <script>
+    const vocabulary = [
+      { word: 'القطة', emoji: '🐱' },
+      { word: 'الكلب', emoji: '🐶' },
+      { word: 'السمكة', emoji: '🐟' },
+      { word: 'العصفور', emoji: '🐦' },
+      { word: 'الأسد', emoji: '🦁' },
+      { word: 'الفيل', emoji: '🐘' },
+      { word: 'التفاحة', emoji: '🍎' },
+      { word: 'الموزة', emoji: '🍌' }
+    ];
+
+    let currentItem;
+    let stars = JSON.parse(localStorage.getItem('gameProgress') || '{"stars": 0}').stars;
+
+    function initGame() {
+      document.getElementById('stars-total').innerText = stars;
+      
+      // اختيار كلمة عشوائية
+      currentItem = vocabulary[Math.floor(Math.random() * vocabulary.length)];
+      document.getElementById('word-display').innerText = currentItem.word;
+      
+      // نطق الكلمة عند البداية لمساعدة الطفل
+      speakWord();
+
+      const optionsContainer = document.getElementById('options');
+      optionsContainer.innerHTML = '';
+
+      // تحضير 3 خيارات (واحد صحيح واثنين خطأ)
+      let options = [currentItem];
+      while(options.length < 3) {
+        let randomItem = vocabulary[Math.floor(Math.random() * vocabulary.length)];
+        if(!options.includes(randomItem)) options.push(randomItem);
+      }
+      
+      // خلط الخيارات
+      options.sort(() => Math.random() - 0.5);
+
+      options.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'option-card';
+        card.innerHTML = `${item.emoji} <span>إضغط هنا</span>`;
+        card.onclick = () => checkAnswer(item);
+        optionsContainer.appendChild(card);
+      });
+    }
+
+    function checkAnswer(selected) {
+      const feedback = document.getElementById('feedback');
+      if(selected.word === currentItem.word) {
+        feedback.innerText = "أحسنت! إجابة صحيحة 🎉";
+        feedback.style.color = "#2ecc71";
+        stars += 5;
+        saveProgress();
+        celebrate();
+        speak('ممتاز!');
+        setTimeout(initGame, 1500);
+      } else {
+        feedback.innerText = "حاول مرة أخرى يا بطل! 🤔";
+        feedback.style.color = "#e74c3c";
+        speak('جرب مرة ثانية');
+      }
+    }
+
+    function speakWord() {
+      const msg = new SpeechSynthesisUtterance(currentItem.word);
+      msg.lang = 'ar-SA';
+      window.speechSynthesis.speak(msg);
+    }
+
+    function speak(text) {
+      const msg = new SpeechSynthesisUtterance(text);
+      msg.lang = 'ar-SA';
+      window.speechSynthesis.speak(msg);
+    }
+
+    function saveProgress() {
+      localStorage.setItem('gameProgress', JSON.stringify({stars: stars}));
+      document.getElementById('stars-total').innerText = stars;
+    }
+
+    function celebrate() {
+      confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+    }
+
+    window.onload = initGame;
+  </script>
+</body>
+</html>

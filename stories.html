@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مكتبة الحكايات السحرية 📖✨</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: #fdfcf0; /* لون ورق قديم خفيف */
+            background-image: url('https://www.transparenttextures.com/patterns/paper-fibers.png');
+            min-height: 100vh;
+        }
+
+        /* تصميم الرفوف للقصص */
+        .shelf-title {
+            background: #d35400;
+            color: white;
+            padding: 10px 40px;
+            border-radius: 50px;
+            display: inline-block;
+            box-shadow: 0 5px 0 #a04000;
+            margin-bottom: 30px;
+            font-size: 1.5rem;
+        }
+
+        .story-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            border-bottom: 10px solid rgba(0,0,0,0.1);
+        }
+
+        .story-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 25px 50px -12px rgba(255, 118, 117, 0.3);
+        }
+
+        .video-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: none; 
+            flex-direction: column;
+            align-items: center; 
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .video-container { 
+            width: 95%; 
+            max-width: 900px; 
+            background: white;
+            border-radius: 40px;
+            padding: 20px;
+            position: relative;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+        }
+        
+        .close-btn {
+            position: absolute; top: -60px; right: 0;
+            background: #ff7675; color: white; width: 50px; height: 50px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; cursor: pointer; border: 4px solid white;
+        }
+
+        /* تحسين مشغل الفيديو ليكون متجاوباً وبأبعاد سينمائية */
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%; /* نسبة 16:9 */
+            height: 0;
+            overflow: hidden;
+            border-radius: 25px;
+        }
+
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .story-lesson {
+            margin-top: 20px;
+            padding: 20px;
+            background: #fff9db;
+            border-radius: 20px;
+            border-right: 8px solid #f1c40f;
+            text-align: right;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <nav class="max-w-6xl mx-auto flex justify-between items-center mb-12 bg-white/90 backdrop-blur p-5 rounded-[35px] shadow-lg sticky top-4 z-50">
+        <button onclick="location.href='child-dashboard.html'" class="bg-rose-500 text-white px-8 py-3 rounded-2xl font-black shadow-lg hover:bg-rose-600 transition-all">
+            🏠 الرئيسية
+        </button>
+        <div class="text-2xl font-black text-rose-600 hidden md:block">📖 حكايات أرنوب والجدة</div>
+        <div class="bg-amber-100 px-6 py-2 rounded-2xl border-2 border-amber-300 font-black text-amber-600">
+            ⭐ <span id="star-count">0</span>
+        </div>
+    </nav>
+
+    <div class="max-w-6xl mx-auto text-center mb-16">
+        <h1 class="text-6xl font-black text-slate-800 mb-4 drop-shadow-sm">وقت الحكاية 🌙</h1>
+        <p class="text-2xl text-slate-500 font-bold">افتح الكتاب واستمتع بأجمل المغامرات</p>
+    </div>
+
+    <div class="max-w-6xl mx-auto">
+        
+        <!-- تصنيف: حكايات الحيوانات -->
+        <div class="shelf-title">🐾 حكايات الحيوانات</div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 mb-20" id="animal-stories">
+        <!-- القصة الأولى -->
+            <div onclick="playStory('Wv1WJGm1ou4', 'الأرنب والسلحفاة', 'نتعلم من هذه القصة أن الصبر والاجتهاد يوصلاننا دائماً للنجاح، وأن الغرور يضيع صاحبه!')" class="story-card bg-white p-6 rounded-[50px]">
+                <div class="h-48 bg-emerald-100 rounded-[40px] flex items-center justify-center text-9xl mb-6">🐢</div>
+            <h3 class="text-2xl font-black text-slate-800">الأرنب والسلحفاة</h3>
+            <p class="text-slate-500 mt-2">تعلم الصبر والاجتهاد مع أرنوب</p>
+            <div class="mt-4 flex justify-center"><span class="bg-rose-100 text-rose-600 px-4 py-1 rounded-full text-sm font-bold">شاهد الآن 📺</span></div>
+        </div>
+
+        <!-- القصة الثانية -->
+            <div onclick="playStory('lPftILe-640', 'الأسد والفأر الذكي', 'لا تستهن أبداً بصغير، فربما يوماً ما ينقذ الصغير حياة الكبير كما فعل الفأر مع الأسد!')" class="story-card bg-white p-6 rounded-[50px]">
+                <div class="h-48 bg-amber-100 rounded-[40px] flex items-center justify-center text-9xl mb-6">🦁</div>
+            <h3 class="text-2xl font-black text-slate-800">الأسد والفأر الذكي</h3>
+            <p class="text-slate-500 mt-2">قصة عن الصداقة ومساعدة الآخرين</p>
+            <div class="mt-4 flex justify-center"><span class="bg-rose-100 text-rose-600 px-4 py-1 rounded-full text-sm font-bold">شاهد الآن 📺</span></div>
+        </div>
+        </div>
+
+        <!-- تصنيف: قصص الأنبياء -->
+        <div class="shelf-title">✨ من قصص الأنبياء</div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 mb-20">
+            <div onclick="playStory('sRqm3DNsFps', 'سيدنا يونس والحوت', 'الصبر والدعاء يفرجان الكروب، وسيدنا يونس علمنا أن الله دائماً يسمعنا حتى في بطن الحوت!')" class="story-card bg-white p-6 rounded-[50px]">
+                <div class="h-48 bg-blue-100 rounded-[40px] flex items-center justify-center text-9xl mb-6">🐳</div>
+                <h3 class="text-2xl font-black text-slate-800">يونس والحوت</h3>
+                <p class="text-slate-500 mt-2">قصة مذهلة عن الصبر والدعاء</p>
+                <div class="mt-4 flex justify-center"><span class="bg-blue-100 text-blue-600 px-4 py-1 rounded-full text-sm font-bold">شاهد الآن 📺</span></div>
+            </div>
+
+            <div onclick="playStory('SMDEeb5qhBc', 'أصحاب الفيل', 'الله يحمي بيته الحرام دائماً، وقصة الفيل تعلم الأطفال عظمة الله وقوته!')" class="story-card bg-white p-6 rounded-[50px]">
+                <div class="h-48 bg-slate-100 rounded-[40px] flex items-center justify-center text-9xl mb-6">🐘</div>
+                <h3 class="text-2xl font-black text-slate-800">أصحاب الفيل</h3>
+                <p class="text-slate-500 mt-2">قصة ممتعة من القرآن الكريم</p>
+                <div class="mt-4 flex justify-center"><span class="bg-blue-100 text-blue-600 px-4 py-1 rounded-full text-sm font-bold">شاهد الآن 📺</span></div>
+            </div>
+        </div>
+
+        <!-- تصنيف: قصص الأمانة والصدق -->
+        <div class="shelf-title">💎 قصص الأخلاق</div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 mb-20">
+            <div onclick="playStory('1c9FvR_zuQ8', 'الحطاب والأمانة', 'الصدق ينجي صاحبه دائماً، والحطاب الأمين حصل على مكافأة كبيرة لأنه لم يكذب!')" class="story-card bg-white p-6 rounded-[50px]">
+                <div class="h-48 bg-orange-100 rounded-[40px] flex items-center justify-center text-9xl mb-6">🪓</div>
+                <h3 class="text-2xl font-black text-slate-800">الحطاب والأمانة</h3>
+                <p class="text-slate-500 mt-2">لماذا الصدق هو الأفضل دائماً؟</p>
+            <div class="mt-4 flex justify-center"><span class="bg-rose-100 text-rose-600 px-4 py-1 rounded-full text-sm font-bold">شاهد الآن 📺</span></div>
+        </div>
+        </div>
+
+    </div>
+
+    <!-- مشغل الفيديو -->
+    <div id="videoOverlay" class="video-overlay" onclick="closeStory()">
+        <div class="video-container" onclick="event.stopPropagation()">
+            <span class="close-btn" onclick="closeStory()">&times;</span>
+            <div class="video-wrapper">
+                <iframe id="storyPlayer" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            </div>
+            
+            <div class="story-lesson" id="story-lesson-box">
+                <h4 class="text-xl font-black text-amber-600 mb-2">ماذا تعلمنا من هذه الحكاية؟ 🤔</h4>
+                <p id="lesson-text" class="text-slate-700 font-bold leading-relaxed">...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // تحديث النجوم
+        const progress = JSON.parse(localStorage.getItem('gameProgress') || '{"stars": 0}');
+        document.getElementById('star-count').innerText = progress.stars;
+
+        function speak(text) {
+            window.speechSynthesis.cancel();
+            const msg = new SpeechSynthesisUtterance(text);
+            msg.lang = 'ar-SA';
+            msg.rate = 0.9;
+            window.speechSynthesis.speak(msg);
+        }
+
+        function playStory(id, title, lesson) {
+            const overlay = document.getElementById('videoOverlay');
+            const player = document.getElementById('storyPlayer');
+            const lessonText = document.getElementById('lesson-text');
+            
+            player.src = `https://www.youtube.com/embed/${id}?autoplay=1`;
+            lessonText.innerText = lesson;
+            overlay.style.display = 'flex';
+            
+            speak("مشاهدة ممتعة لحكاية " + title);
+
+            // إضافة نجمتين لمشاهدة قصة
+            addStars(2);
+        }
+
+        function closeStory() {
+            const overlay = document.getElementById('videoOverlay');
+            const player = document.getElementById('storyPlayer');
+            player.src = '';
+            overlay.style.display = 'none';
+        }
+
+        function addStars(num) {
+            let data = JSON.parse(localStorage.getItem('gameProgress') || '{"stars":0}');
+            data.stars += num;
+            localStorage.setItem('gameProgress', JSON.stringify(data));
+            document.getElementById('star-count').innerText = data.stars;
+        }
+
+        // نطق ترحيبي عند المرور على الكروت
+        document.querySelectorAll('.story-card').forEach(card => {
+            card.onmouseenter = () => {
+                const title = card.querySelector('h3').innerText;
+                speak(title);
+            };
+        });
+
+        window.onload = () => {
+            setTimeout(() => {
+                speak("مرحباً بك في مكتبة الحكايات.. اختر قصة لنسمعها معاً");
+            }, 500);
+        };
+    </script>
+</body>
+</html>

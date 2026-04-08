@@ -1,0 +1,181 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
+
+/* 1. الجذور والنظام اللوني الذكي */
+:root {
+    --font-main: 'Cairo', sans-serif;
+    --transition-smooth: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    --border-radius-lg: 30px;
+    --border-radius-md: 15px;
+    --glass-border: 1px solid rgba(255, 255, 255, 0.25);
+    --glass-bg: rgba(255, 255, 255, 0.15);
+}
+
+/* 2. تخصيص الفئات العمرية (Theme System) */
+.age-kid {
+    --bg-main: linear-gradient(135deg, #FF9A9E 0%, #FAD0C4 99%, #FAD0C4 100%);
+    --accent: #FFD93D;
+    --text: #2d3436;
+    --card-bg: rgba(255, 255, 255, 0.9);
+    --primary-btn: #FF6B6B;
+}
+
+.age-teen {
+    --bg-main: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --accent: #a18cd1;
+    --text: #ffffff;
+    --card-bg: rgba(0, 0, 0, 0.2);
+    --primary-btn: #f093fb;
+}
+
+.age-adult {
+    --bg-main: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    --accent: #1abc9c;
+    --text: #2c3e50;
+    --card-bg: rgba(255, 255, 255, 0.8);
+    --primary-btn: #34495e;
+}
+
+/* 3. الإعدادات العامة */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent; /* تحسين اللمس للموبايل */
+}
+
+body {
+    font-family: var(--font-main);
+    color: var(--text);
+    background: var(--bg-main);
+    background-attachment: fixed;
+    min-height: 100vh;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* 4. الهيدر (Navigation) الاحترافي */
+.smart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2rem 5%;
+    background: var(--glass-bg);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-bottom: var(--glass-border);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.logo {
+    font-size: 1.8rem;
+    font-weight: 900;
+    letter-spacing: -1px;
+    background: linear-gradient(to right, var(--primary-btn), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* 5. تصميم الكروت (Glassmorphism) */
+.card {
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    border-radius: var(--border-radius-lg);
+    padding: 2.5rem;
+    border: var(--glass-border);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+    transition: var(--transition-smooth);
+    margin: 20px;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+}
+
+/* 6. الأزرار التفاعلية */
+.btn-universal {
+    padding: 12px 30px;
+    border-radius: 50px;
+    border: none;
+    font-weight: 700;
+    font-family: var(--font-main);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: var(--primary-btn);
+    color: white;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.btn-primary:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    transform: rotate(-1deg) scale(1.05);
+}
+
+/* 7. شريط التقدم (Progress Bar) */
+.progress-container {
+    background: rgba(0,0,0,0.05);
+    height: 12px;
+    border-radius: 20px;
+    overflow: hidden;
+    margin: 20px 0;
+    border: 1px solid rgba(255,255,255,0.3);
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--primary-btn));
+    border-radius: 20px;
+    width: 0%;
+    transition: width 1.5s cubic-bezier(0.1, 0.7, 1.0, 0.1);
+}
+
+/* 8. الحركات (Animations) */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 9. تحسين العرض على الموبايل */
+@media (max-width: 768px) {
+    .smart-header {
+        padding: 1rem;
+        flex-direction: row; /* الحفاظ على الهوية البصرية حتى في الصغير */
+    }
+    
+    .logo { font-size: 1.4rem; }
+    
+    .card {
+        padding: 1.5rem;
+        margin: 15px;
+    }
+    
+    .btn-universal {
+        width: 100%; /* أزرار كاملة العرض في الموبايل لسهولة الضغط */
+    }
+}
+
+/* 10. وضع الحماية (Dark Mode Friendly) */
+@media (prefers-color-scheme: dark) {
+    .age-adult {
+        --card-bg: rgba(30, 39, 46, 0.8);
+        --text: #f1f2f6;
+    }
+}

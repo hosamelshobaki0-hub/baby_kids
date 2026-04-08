@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>فرقعة الفقاعات 🫧 | Kids Learning</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* منع التمرير */
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            font-family: 'Cairo', sans-serif;
+            touch-action: manipulation;
+        }
+
+        #game-canvas {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(2px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            animation: floatUp linear forwards;
+            user-select: none;
+        }
+
+        @keyframes floatUp {
+            from { transform: translateY(110vh); }
+            to { transform: translateY(-20vh); }
+        }
+
+        /* تأثير الفرقعة */
+        .pop-effect {
+            animation: popAnim 0.3s ease-out forwards;
+        }
+
+        @keyframes popAnim {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.8); opacity: 0; }
+        }
+
+        .score-box {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-size: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #ff7675;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+
+    <button class="back-btn" onclick="location.href='games.html'">🔙 خروج</button>
+    <div class="score-box">⭐ <span id="stars">0</span></div>
+    <div id="game-canvas"></div>
+
+    <script>
+        const canvas = document.getElementById('game-canvas');
+        const starsDisplay = document.getElementById('stars');
+        let stars = JSON.parse(localStorage.getItem('gameProgress') || '{"stars": 0}').stars;
+        starsDisplay.innerText = stars;
+
+        const emojis = ['⭐', '🍎', '🍌', '🧸', '🚗', '🦁', '🐘', '🍦', '🎈'];
+        const colors = ['#FFadad', '#ffd6a5', '#fdffb6', '#caffbf', '#9bf6ff', '#a0c4ff', '#bdb2ff', '#ffc6ff'];
+
+        function createBubble() {
+            const bubble = document.createElement('div');
+            const size = Math.random() * 60 + 80; // حجم الفقاعة بين 80 و 140
+            const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            
+            bubble.className = 'bubble';
+            bubble.style.width = size + 'px';
+            bubble.style.height = size + 'px';
+            bubble.style.left = Math.random() * (window.innerWidth - size) + 'px';
+            bubble.style.background = `radial-gradient(circle at 30% 30%, white, ${randomColor})`;
+            bubble.style.animationDuration = (Math.random() * 4 + 4) + 's'; // سرعة الصعود
+            
+            bubble.innerText = ''; // الفقاعة فارغة في البداية
+
+            // عند الضغط على الفقاعة
+            bubble.addEventListener('touchstart', (e) => { e.preventDefault(); pop(bubble, randomEmoji); });
+            bubble.addEventListener('mousedown', () => pop(bubble, randomEmoji));
+
+            canvas.appendChild(bubble);
+
+            // حذف الفقاعة بعد انتهاء الحركة
+            bubble.addEventListener('animationend', () => bubble.remove());
+        }
+
+        function pop(el, emoji) {
+            if(el.classList.contains('pop-effect')) return;
+
+            el.innerText = emoji; // يظهر الشكل فجأة عند الفرقعة
+            el.classList.add('pop-effect');
+            
+            // صوت فرقعة (بسيط باستخدام نطق المتصفح لزيادة التفاعل)
+            playPopSound();
+
+            stars += 1;
+            starsDisplay.innerText = stars;
+            saveProgress();
+
+            setTimeout(() => el.remove(), 300);
+        }
+
+        function playPopSound() {
+            // لمحاكاة صوت الفرقعة بشكل تعليمي
+            const utterance = new SpeechSynthesisUtterance("بُوب");
+            utterance.lang = 'ar-SA';
+            utterance.volume = 0.5;
+            utterance.rate = 2;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function saveProgress() {
+            localStorage.setItem('gameProgress', JSON.stringify({stars: stars}));
+        }
+
+        // توليد فقاعات باستمرار
+        setInterval(createBubble, 1000);
+
+    </script>
+</body>
+</html>

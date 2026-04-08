@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدرسة الأذكياء 🏫 | قائمة التعلم</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: #f8fafc;
+            background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* كرت الدرس المطور */
+        .lesson-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-bottom: 10px solid rgba(0,0,0,0.05);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .lesson-card:hover {
+            transform: translateY(-15px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+        }
+
+        .lesson-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+            transform: rotate(45deg);
+            transition: 0.5s;
+        }
+
+        .lesson-card:hover::before {
+            left: 100%;
+        }
+
+        .icon-box {
+            width: 90px;
+            height: 90px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+
+        /* أنيميشن الظهور التدريجي */
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .animate-card { animation: zoomIn 0.5s ease-out forwards; }
+    </style>
+</head>
+<body class="p-4 md:p-10">
+
+    <header class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center mb-12 bg-white p-8 rounded-[40px] shadow-xl border-b-4 border-sky-100">
+        <div class="text-center md:text-right mb-4 md:mb-0">
+            <h1 class="text-4xl font-black text-sky-900 mb-2">مدرسة الأذكياء الصغار 🎓</h1>
+            <p class="text-sky-600 text-xl font-bold">اختر درساً وابدأ مغامرتك العلمية!</p>
+        </div>
+        <div class="flex items-center gap-4 bg-amber-50 px-8 py-4 rounded-3xl border-2 border-amber-200">
+            <span class="text-4xl">⭐</span>
+            <div class="flex flex-col">
+                <span id="star-count" class="text-3xl font-black text-amber-600 leading-none">0</span>
+                <span class="text-amber-500 font-bold text-sm">نجمة ذكاء</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+        
+        <div onclick="window.location.href='arabic-letters.html'" class="lesson-card bg-white p-10 rounded-[50px] flex flex-col items-center text-center animate-card" style="animation-delay: 0.1s">
+            <div class="icon-box bg-emerald-100">📖</div>
+            <h3 class="text-2xl font-black text-emerald-600">لغتي الجميلة</h3>
+            <p class="text-slate-400 font-bold mt-2 text-lg">تعلم حروف الهجاء</p>
+            <span class="mt-6 bg-emerald-50 text-emerald-600 px-6 py-2 rounded-full font-black text-sm">دخول ←</span>
+        </div>
+
+        <div onclick="window.location.href='numbers-game-ar.html'" class="lesson-card bg-white p-10 rounded-[50px] flex flex-col items-center text-center animate-card" style="animation-delay: 0.2s">
+            <div class="icon-box bg-blue-100">🔢</div>
+            <h3 class="text-2xl font-black text-blue-600">الأرقام والمرح</h3>
+            <p class="text-slate-400 font-bold mt-2 text-lg">تعلم العد من 1 إلى 10</p>
+            <span class="mt-6 bg-blue-50 text-blue-600 px-6 py-2 rounded-full font-black text-sm">دخول ←</span>
+        </div>
+
+        <div onclick="window.location.href='english-letters.html'" class="lesson-card bg-white p-10 rounded-[50px] flex flex-col items-center text-center animate-card" style="animation-delay: 0.3s">
+            <div class="icon-box bg-purple-100">🔤</div>
+            <h3 class="text-2xl font-black text-purple-600">English Adventure</h3>
+            <p class="text-slate-400 font-bold mt-2 text-lg">Learn ABC Letters</p>
+            <span class="mt-6 bg-purple-50 text-purple-600 px-6 py-2 rounded-full font-black text-sm">Enter ←</span>
+        </div>
+
+        <div onclick="window.location.href='lesson-adventure.html?type=colors'" class="lesson-card bg-white p-10 rounded-[50px] flex flex-col items-center text-center animate-card" style="animation-delay: 0.4s">
+            <div class="icon-box bg-rose-100">🎨</div>
+            <h3 class="text-2xl font-black text-rose-600">عالم الألوان</h3>
+            <p class="text-slate-400 font-bold mt-2 text-lg">اكتشف ألوان الطبيعة</p>
+            <span class="mt-6 bg-rose-50 text-rose-600 px-6 py-2 rounded-full font-black text-sm">دخول ←</span>
+        </div>
+
+        <div onclick="window.location.href='lesson-adventure.html?type=animals'" class="lesson-card bg-white p-10 rounded-[50px] flex flex-col items-center text-center animate-card" style="animation-delay: 0.5s">
+            <div class="icon-box bg-amber-100">🦁</div>
+            <h3 class="text-2xl font-black text-amber-600">أصدقائي الحيوانات</h3>
+            <p class="text-slate-400 font-bold mt-2 text-lg">أصوات وأسماء الغابة</p>
+            <span class="mt-6 bg-amber-50 text-amber-600 px-6 py-2 rounded-full font-black text-sm">دخول ←</span>
+        </div>
+
+        <div onclick="window.location.href='lesson-adventure.html?type=fruits'" class="lesson-card bg-white p-10 rounded-[50px] flex flex-col items-center text-center animate-card" style="animation-delay: 0.6s">
+            <div class="icon-box bg-orange-100">🍎</div>
+            <h3 class="text-2xl font-black text-orange-600">سلة الغذاء الصحي</h3>
+            <p class="text-slate-400 font-bold mt-2 text-lg">تعرف على الفواكه اللذيذة</p>
+            <span class="mt-6 bg-orange-50 text-orange-600 px-6 py-2 rounded-full font-black text-sm">دخول ←</span>
+        </div>
+
+    </main>
+
+    <div class="max-w-6xl mx-auto mt-16 flex justify-center">
+        <button onclick="window.location.href='roadmap.html'" class="bg-slate-800 text-white px-12 py-5 rounded-[30px] font-black text-xl shadow-2xl hover:scale-110 transition-transform active:scale-95">
+            🏠 العودة إلى الخريطة الكبرى
+        </button>
+    </div>
+
+    <script>
+        // دالة نطق الترحيب بالفصحى
+        function welcomeVoice() {
+            window.speechSynthesis.cancel();
+            const msg = new SpeechSynthesisUtterance("مرحباً بك يا ذكي في قائمة الدروس.. ماذا تريد أن تتعلم اليوم؟");
+            msg.lang = 'ar-SA';
+            msg.rate = 0.9;
+            window.speechSynthesis.speak(msg);
+        }
+
+        window.onload = () => {
+            // تحديث النجوم
+            const data = JSON.parse(localStorage.getItem('gameProgress') || '{"stars":0}');
+            document.getElementById('star-count').innerText = data.stars;
+            
+            // الترحيب الصوتي
+            setTimeout(welcomeVoice, 1000);
+        };
+    </script>
+</body>
+</html>

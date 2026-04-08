@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مغامرة الحروف الإنجليزية 🔤</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@900&family=Fredoka+One&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Fredoka One', 'Cairo', cursive;
+      background: #fdf4ff; 
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    .letter-card {
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      cursor: pointer;
+      border-bottom: 8px solid #f0f0f0;
+    }
+    .letter-card:hover {
+      transform: translateY(-10px) rotate(2deg);
+      box-shadow: 0 20px 30px rgba(168, 85, 247, 0.2);
+    }
+    .letter-card:active { transform: scale(0.9); }
+    
+    .big-letter-overlay {
+      animation: zoomInFade 0.8s ease-out forwards;
+      pointer-events: none;
+    }
+    @keyframes zoomInFade {
+      0% { transform: scale(0.5) rotate(-10deg); opacity: 0; }
+      50% { transform: scale(1.2) rotate(10deg); opacity: 1; }
+      100% { transform: scale(1.5); opacity: 0; }
+    }
+    
+    .floating-star {
+      position: fixed;
+      animation: flyUp 1s ease-out forwards;
+      z-index: 100;
+    }
+    @keyframes flyUp {
+      0% { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(-200px) scale(2); opacity: 0; }
+    }
+  </style>
+</head>
+<body class="p-4 md:p-8">
+
+  <nav class="max-w-6xl mx-auto flex justify-between items-center mb-10">
+    <a href="roadmap.html" class="bg-purple-600 text-white px-8 py-3 rounded-2xl font-black shadow-lg hover:bg-purple-700 transition-all flex items-center gap-2">
+      <span>⬅️</span> العودة للخريطة
+    </a>
+    <div class="bg-white px-6 py-3 rounded-2xl shadow-md border-b-4 border-purple-200 flex items-center gap-3">
+      <span class="text-2xl font-black text-purple-600">نجوم الحروف ⭐</span>
+      <span id="star-count-ui" class="text-2xl font-black text-slate-700">0</span>
+    </div>
+  </nav>
+
+  <div id="alphabet-grid" class="max-w-6xl mx-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+    </div>
+
+  <div id="overlay-container" class="fixed inset-0 pointer-events-none flex items-center justify-center z-50"></div>
+
+  <script>
+    const alphabet = [
+      { l: 'A', w: 'Apple', e: '🍎', m: 'تُفاحة' }, { l: 'B', w: 'Ball', e: '⚽', m: 'كُرة' },
+      { l: 'C', w: 'Cat', e: '🐱', m: 'قِطة' }, { l: 'D', w: 'Dog', e: '🐶', m: 'كَلب' },
+      { l: 'E', w: 'Elephant', e: '🐘', m: 'فِيل' }, { l: 'F', w: 'Fish', e: '🐟', m: 'سَمكة' },
+      { l: 'G', w: 'Grape', e: '🍇', m: 'عِنب' }, { l: 'H', w: 'Horse', e: '🐎', m: 'حِصان' },
+      { l: 'I', w: 'Ice Cream', e: '🍦', m: 'مثلجات' }, { l: 'J', w: 'Juice', e: '🧃', m: 'عَصير' },
+      { l: 'K', w: 'Kangaroo', e: '🦘', m: 'كَنغر' }, { l: 'L', w: 'Lion', e: '🦁', m: 'أَسد' },
+      { l: 'M', w: 'Monkey', e: '🐒', m: 'قِرد' }, { l: 'N', w: 'Nest', e: '🪺', m: 'عُش' },
+      { l: 'O', w: 'Orange', e: '🍊', m: 'بُرتقال' }, { l: 'P', w: 'Panda', e: '🐼', m: 'باندا' },
+      { l: 'Q', w: 'Queen', e: '👸', m: 'مَلِكة' }, { l: 'R', w: 'Rabbit', e: '🐰', m: 'أَرنب' },
+      { l: 'S', w: 'Sun', e: '☀️', m: 'شَمس' }, { l: 'T', w: 'Tiger', e: '🐯', m: 'نَمِر' },
+      { l: 'U', w: 'Umbrella', e: '⛱️', m: 'مِظلة' }, { l: 'V', w: 'Van', e: '🚐', m: 'حافِلة' },
+      { l: 'W', w: 'Whale', e: '🐳', m: 'حُوت' }, { l: 'X', w: 'Xylophone', e: '🎹', m: 'إكسيلوفون' },
+      { l: 'Y', w: 'Yo-Yo', e: '🪀', m: 'يويو' }, { l: 'Z', w: 'Zebra', e: '🦓', m: 'حِمار وَحشي' }
+    ];
+
+    const colors = ['#FFADAD', '#FFD6A5', '#CAFFBF', '#9BF6FF', '#A0C4FF', '#BDB2FF', '#FFC6FF'];
+    const grid = document.getElementById('alphabet-grid');
+    let lettersClicked = 0;
+
+    function updateStarUI() {
+        const data = JSON.parse(localStorage.getItem('gameProgress') || '{"stars":0}');
+        document.getElementById('star-count-ui').innerText = data.stars;
+    }
+
+    // دالة النطق بالفصحى (تتعرف على اللغة تلقائياً)
+    function speakFusha(text, langCode = 'ar-SA') {
+      window.speechSynthesis.cancel();
+      const msg = new SpeechSynthesisUtterance(text);
+      msg.lang = langCode;
+      msg.rate = 0.8;
+      msg.pitch = 1.2;
+      window.speechSynthesis.speak(msg);
+    }
+
+    alphabet.forEach((item, index) => {
+      const card = document.createElement('div');
+      const cardColor = colors[index % colors.length];
+      card.className = "letter-card bg-white p-8 rounded-[40px] shadow-xl text-center";
+      card.style.borderColor = cardColor;
+      
+      card.innerHTML = `
+        <div class="text-7xl font-black mb-2" style="color: ${cardColor}">${item.l}</div>
+        <div class="text-3xl">${item.e}</div>
+      `;
+      
+      card.onclick = () => {
+        // نطق الحرف بالانجليزية
+        speakFusha(item.l, 'en-US'); 
+        
+        // نطق المعنى بالعربية الفصحى بعد قليل
+        setTimeout(() => {
+            speakFusha(`هذا هو حرف الـ ${item.l} .. مِثلُ كَلِمة ${item.m}`, 'ar-SA');
+        }, 1000);
+        
+        showBigLetter(item.l, cardColor);
+        lettersClicked++;
+        
+        if (lettersClicked % 8 === 0) {
+          giveStar();
+        }
+      };
+      
+      grid.appendChild(card);
+    });
+
+    function showBigLetter(letter, color) {
+      const container = document.getElementById('overlay-container');
+      const div = document.createElement('div');
+      div.className = "big-letter-overlay text-[18rem] font-black drop-shadow-2xl";
+      div.style.color = color;
+      div.innerText = letter;
+      
+      container.appendChild(div);
+      setTimeout(() => div.remove(), 800);
+    }
+
+    function giveStar() {
+      const appData = JSON.parse(localStorage.getItem('gameProgress') || '{"stars":0}');
+      appData.stars += 1;
+      localStorage.setItem('gameProgress', JSON.stringify(appData));
+      updateStarUI();
+      
+      // تشجيع بالفصحى
+      const phrases = [
+          "رائع جداً! لقد حصلت على نجمة جديدة",
+          "أنت بطلٌ متميزٌ في اللغة الإنجليزية.. خذ هذه النجمة",
+          "أحسنت يا ذكي.. استمر في التعلم",
+          "عملٌ رائع.. أنت تقترب من إنهاء جميع الحروف"
+      ];
+      speakFusha(phrases[Math.floor(Math.random() * phrases.length)], 'ar-SA');
+      
+      const star = document.createElement('div');
+      star.className = "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-9xl floating-star";
+      star.innerText = "⭐";
+      document.body.appendChild(star);
+      setTimeout(() => star.remove(), 1000);
+    }
+
+    window.onload = () => {
+      updateStarUI();
+      // ترحيب أرنوب بالفصحى
+      setTimeout(() => {
+          speakFusha("هيا يا بطل لنتعلم حروف اللغة الإنجليزية.. اضغط على أي حرف لكي تسمع نُطقه الصحيح", 'ar-SA');
+      }, 500);
+    };
+  </script>
+</body>
+</html>

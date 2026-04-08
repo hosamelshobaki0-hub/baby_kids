@@ -1,0 +1,162 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تقدمي | Kids Learning</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: linear-gradient(135deg, #ffd89b, #19547b);
+      min-height: 100vh; color: white;
+    }
+    .header { 
+      background: linear-gradient(135deg, #f093fb, #f5576c); 
+      color: white; padding: 40px; text-align: center; 
+    }
+    .container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
+    .stars-container { 
+      text-align: center; margin: 40px 0; 
+    }
+    .total-stars { 
+      font-size: clamp(4rem, 12vw, 8rem); font-weight: bold; 
+      margin-bottom: 20px; text-shadow: 4px 4px 8px rgba(0,0,0,0.5);
+      animation: starShine 2s ease-in-out infinite alternate;
+    }
+    .stats-grid { 
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); 
+      gap: 40px; margin: 40px 0; 
+    }
+    .stat-card { 
+      background: rgba(255,255,255,0.15); 
+      backdrop-filter: blur(20px); border-radius: 30px; 
+      padding: 40px; text-align: center; border: 2px solid rgba(255,255,255,0.3);
+      box-shadow: 0 25px 70px rgba(0,0,0,0.3);
+      transition: all 0.4s ease;
+    }
+    .stat-card:hover { 
+      transform: translateY(-10px); background: rgba(255,255,255,0.25);
+    }
+    .stat-icon { font-size: 4rem; margin-bottom: 20px; display: block; }
+    .stat-number { font-size: 3rem; font-weight: bold; color: #ffd700; margin-bottom: 10px; }
+    .stat-label { font-size: 1.5rem; }
+    .kid-btn { 
+      background: linear-gradient(45deg, #4facfe, #00f2fe); 
+      color: white; border: none; border-radius: 50px; 
+      padding: 20px 50px; font-size: 1.8rem; font-weight: bold; cursor: pointer;
+      margin: 20px auto 0; display: block; box-shadow: 0 15px 40px rgba(79,172,254,0.4);
+      transition: all 0.3s; font-family: inherit;
+    }
+    .kid-btn:hover { transform: scale(1.05); box-shadow: 0 25px 60px rgba(79,172,254,0.6); }
+    @keyframes starShine {
+      from { text-shadow: 0 0 20px #ffd700, 0 0 30px #ffd700, 0 0 40px #ffd700; }
+      to { text-shadow: 0 0 30px #ffed4a, 0 0 40px #ffed4a, 0 0 50px #ffed4a; }
+    }
+    @media (max-width: 768px) { 
+      .stats-grid { grid-template-columns: 1fr; gap: 30px; }
+      .container { padding: 20px 15px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1 class="text-5xl md:text-6xl font-bold mb-6 drop-shadow-2xl">⭐ تقدمي الرائع!</h1>
+    <div id="total-stars-display" class="total-stars mb-8">تحميل...</div>
+    <button class="kid-btn inline-block px-12 py-6 text-xl" onclick="goHome()">🏠 الرئيسية</button>
+  </div>
+
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-icon">📚</span>
+        <div class="stat-number" id="lessons-count">0</div>
+        <div class="stat-label">دروس مكتملة</div>
+        <div id="lesson-list" style="margin-top: 20px; font-size: 1.2rem;"></div>
+      </div>
+
+      <div class="stat-card">
+        <span class="stat-icon">🎮</span>
+        <div class="stat-number" id="games-count">0</div>
+        <div class="stat-label">ألعاب لعبتها</div>
+        <div id="game-list" style="margin-top: 20px; font-size: 1.2rem;"></div>
+      </div>
+
+      <div class="stat-card">
+        <span class="stat-icon">⭐</span>
+        <div class="stat-number" id="total-score">0</div>
+        <div class="stat-label">نقاط كلية</div>
+        <p style="margin-top: 20px; font-size: 1.3rem;">برافو! استمر 👏</p>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px;">
+      <button class="kid-btn text-xl" onclick="shareProgress()">مشاركة التقدم 📱</button>
+    </div>
+  </div>
+
+  <script>
+    let progressData = JSON.parse(localStorage.getItem('gameProgress') || '{"stars": 0, "lessons": [], "games": [], "score": 0}');
+    let userData = JSON.parse(localStorage.getItem('kidsUser') || '{}');
+
+    function initProgress() {
+      if (!userData.childName) {
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      // Update stars
+      const starsCount = progressData.stars || 0;
+      document.getElementById('total-stars-display').innerHTML = '⭐'.repeat(starsCount);
+      
+      // Lessons
+      const lessons = progressData.lessons || [];
+      document.getElementById('lessons-count').textContent = lessons.length;
+      document.getElementById('lesson-list').innerHTML = lessons.length ? 
+        lessons.map(l => `✅ ${getLessonName(l)}`).join('<br>') : 'ابدأ التعلم! 📚';
+      
+      // Games
+      const games = progressData.games || [];
+      document.getElementById('games-count').textContent = games.length;
+      document.getElementById('game-list').innerHTML = games.length ? 
+        games.map(g => `🏆 ${g}`).join('<br>') : 'العب ألعاب! 🎮';
+      
+      // Score
+      document.getElementById('total-score').textContent = progressData.score || 0;
+    }
+
+    function getLessonName(type) {
+      const names = {
+        'red': 'اللون الأحمر',
+        'blue': 'اللون الأزرق',
+        'yellow': 'اللون الأصفر',
+        'green': 'اللون الأخضر',
+        'alphabet': 'الحروف',
+        'shapes': 'الأشكال'
+      };
+      return names[type] || 'درس رائع';
+    }
+
+    function goHome() {
+      window.location.href = 'child-dashboard.html';
+    }
+
+    function shareProgress() {
+      const text = `🏆 تقدمي في Kids Learning!\n⭐ نجوم: ${progressData.stars || 0}\n📚 دروس: ${(progressData.lessons || []).length}\n🎮 ألعاب: ${(progressData.games || []).length}`;
+      navigator.clipboard.writeText(text).then(() => alert('تم نسخ التقدم! 📋'));
+    }
+
+    window.onload = initProgress;
+  </script>
+</body>
+</html>
+</content>
+</create_file>
+
+**8 صفحات جاهزة**: login, register, child-dashboard, learning, lesson, games, color-game, progress ✅
+
+**Last**: parent-dashboard.html to complete!
+
+<xai:function_call name="create_file">
+<parameter name="absolute_path">c:/Users/Nour Elshobaki/Desktop/dema/kids-learning-platform/parent-dashboard.html

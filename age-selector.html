@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>اختيار الفئة العمرية</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="age-kid">
+  <nav class="header">
+    <div class="logo">🌟 تعليمي</div>
+    <a href="login.html" class="nav-btn">دخول</a>
+  </nav>
+  
+  <div class="flex items-center justify-center min-h-screen p-8">
+    <div class="card max-w-4xl w-full text-center">
+      <h1 class="text-5xl font-bold mb-12">فئتك العمرية؟</h1>
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <button onclick="setAge('kid')" class="p-12 rounded-3xl bg-gradient-to-r from-pink-400 to-orange-400 text-white text-2xl font-bold shadow-2xl hover:scale-105 transition-all">
+          👶 الأطفال<br><small>1-6 سنوات</small>
+        </button>
+        <button onclick="setAge('teen')" class="p-12 rounded-3xl bg-gradient-to-r from-blue-400 to-purple-500 text-white text-2xl font-bold shadow-2xl hover:scale-105 transition-all">
+          🧒 المراهقين<br><small>7-12 سنة</small>
+        </button>
+        <button onclick="setAge('adult')" class="p-12 rounded-3xl bg-gradient-to-r from-green-400 to-blue-500 text-white text-2xl font-bold shadow-2xl hover:scale-105 transition-all">
+          🧑 الكبار<br><small>13+ سنة</small>
+        </button>
+        <button onclick="setAge('senior')" class="p-12 rounded-3xl bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-2xl font-bold shadow-2xl hover:scale-105 transition-all">
+          👴 كبار السن<br><small>60+ سنة</small>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function setAge(age) {
+      localStorage.setItem('ageGroup', age);
+      document.body.className = `age-${age}`;
+      setTimeout(() => location.href = 'child-dashboard.html', 500);
+    }
+    
+    // تحميل الفئة السابقة
+    const savedAge = localStorage.getItem('ageGroup');
+    if(savedAge) {
+      document.body.className = `age-${savedAge}`;
+    }
+  </script>
+</body>
+</html>
+

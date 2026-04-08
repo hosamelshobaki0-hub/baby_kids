@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مغامرة الأرقام المرحة 🔢</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: #f0fdfa; /* خلفية مريحة للعين */
+            min-height: 100vh;
+        }
+
+        .number-card {
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            border-bottom: 6px solid #e2e8f0;
+        }
+
+        .number-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            border-color: #10b981;
+            box-shadow: 0 15px 30px rgba(16, 185, 129, 0.2);
+        }
+
+        .number-card.active {
+            background-color: #ecfdf5;
+            border-color: #10b981;
+            transform: scale(1.1);
+        }
+
+        /* أنيميشن ظهور العناصر المعدودة */
+        .item-pop {
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .star-reward {
+            position: fixed;
+            animation: flyUp 1.5s ease-out forwards;
+            z-index: 100;
+            font-size: 3rem;
+        }
+
+        @keyframes flyUp {
+            0% { transform: translate(-50%, 0); opacity: 1; bottom: 20%; }
+            100% { transform: translate(-50%, -200px); opacity: 0; bottom: 60%; }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 flex flex-col items-center">
+
+    <nav class="w-full max-w-5xl flex justify-between items-center mb-8 bg-white p-4 rounded-3xl shadow-sm">
+        <a href="child-dashboard.html" class="bg-emerald-500 text-white px-6 py-2 rounded-2xl font-bold hover:bg-emerald-600 transition">
+            🏠 العودة
+        </a>
+        <div class="flex items-center gap-2 bg-amber-50 px-5 py-2 rounded-2xl border-2 border-amber-200">
+            <span class="text-xl">⭐</span>
+            <span id="star-count" class="text-xl font-black text-amber-600">0</span>
+        </div>
+    </nav>
+
+    <div id="counting-area" class="w-full max-w-4xl bg-white rounded-[50px] p-8 mb-10 shadow-inner border-4 border-dashed border-emerald-100 min-h-[250px] flex flex-wrap justify-center items-center gap-4">
+        <h2 class="text-2xl text-slate-400 font-bold w-full text-center">اضغط على رقم لنتعلمه معاً!</h2>
+    </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-5 gap-6 w-full max-w-5xl" id="numbers-grid">
+        </div>
+
+    <script>
+        const numbersData = [
+            { n: 1, word: 'واحد', icon: '🦁' },
+            { n: 2, word: 'اثنان', icon: '🐘' },
+            { n: 3, word: 'ثلاثة', icon: '🦒' },
+            { n: 4, word: 'أربعة', icon: '🐒' },
+            { n: 5, word: 'خمسة', icon: '🐰' },
+            { n: 6, word: 'ستة', icon: '🐱' },
+            { n: 7, word: 'سبعة', icon: '🐶' },
+            { n: 8, word: 'ثمانية', icon: '🐝' },
+            { n: 9, word: 'تسعة', icon: '🦋' },
+            { n: 10, word: 'عشرة', icon: '🍎' }
+        ];
+
+        let stars = JSON.parse(localStorage.getItem('gameProgress') || '{"stars":0}').stars;
+        let gameMode = 'learn'; // 'learn' or 'quiz'
+        let quizCounter = 0;
+        let currentQuizNumber = null;
+
+        document.getElementById('star-count').innerText = stars;
+
+        const grid = document.getElementById('numbers-grid');
+        const countArea = document.getElementById('counting-area');
+        let learnedNumbers = new Set();
+
+        function speakFusha(text) {
+            window.speechSynthesis.cancel();
+            const msg = new SpeechSynthesisUtterance(text);
+            msg.lang = 'ar-SA';
+            msg.rate = 0.8;
+            msg.pitch = 1.2;
+            window.speechSynthesis.speak(msg);
+        }
+
+        function createGrid() {
+            grid.innerHTML = ''; // Clear existing grid
+            numbersData.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "number-card bg-white p-8 rounded-[40px] text-center";
+                card.innerHTML = `
+                    <div class="text-6xl font-black text-emerald-600 mb-2">${item.n}</div>
+                    <div class="text-xl font-bold text-slate-400">${item.word}</div>
+                `;
+
+                card.onclick = () => {
+                    if (gameMode === 'learn') {
+                        showCounting(item);
+                        highlightCard(card);
+                        if(!learnedNumbers.has(item.n)) {
+                            learnedNumbers.add(item.n);
+                            if(learnedNumbers.size % 3 === 0) giveStar();
+                        }
+                        // After a few learning interactions, suggest a quiz
+                        if (learnedNumbers.size >= 3 && quizCounter === 0) {
+                            setTimeout(startQuizMode, 2000);
+                        }
+                    } else if (gameMode === 'quiz') {
+                        checkQuizAnswer(item, card);
+                    }
+                };
+
+                grid.appendChild(card);
+            });
+        }
+
+        function showCounting(item) {
+            countArea.innerHTML = '';
+            speakFusha(`${item.n} ... ${item.word}`);
+
+            for (let i = 0; i < item.n; i++) {
+                setTimeout(() => {
+                    const el = document.createElement('div');
+                    el.className = "text-6xl item-pop";
+                    el.innerText = item.icon;
+                    countArea.appendChild(el);
+                }, i * 150);
+            }
+        }
+
+        function highlightCard(activeCard) {
+            document.querySelectorAll('.number-card').forEach(c => c.classList.remove('active'));
+            activeCard.classList.add('active');
+        }
+
+        function giveStar() {
+            stars += 5;
+            document.getElementById('star-count').innerText = stars;
+            localStorage.setItem('gameProgress', JSON.stringify({stars: stars}));
+            
+            const star = document.createElement('div');
+            star.className = "star-reward";
+            star.style.left = "50%";
+            star.innerText = "⭐";
+            document.body.appendChild(star);
+            
+            speakFusha("رائع! لقد حصلت على نجوم جديدة لنشاطك");
+            setTimeout(() => star.remove(), 1500);
+        }
+
+        function startQuizMode() {
+            gameMode = 'quiz';
+            quizCounter = 0;
+            countArea.innerHTML = `
+                <h2 class="text-2xl text-emerald-600 font-black w-full text-center">حان وقت الاختبار! 🧠</h2>
+                <p class="text-xl text-slate-500 w-full text-center">اضغط على الرقم الذي تسمعه</p>
+            `;
+            speakFusha("حان وقت الاختبار! اضغط على الرقم الذي تسمعه");
+            setTimeout(generateQuiz, 2000);
+        }
+
+        function generateQuiz() {
+            // Select a random number from the ones already learned, or all if none learned yet
+            const availableNumbers = learnedNumbers.size > 0 ? 
+                                    numbersData.filter(n => learnedNumbers.has(n.n)) : 
+                                    numbersData;
+            currentQuizNumber = availableNumbers[Math.floor(Math.random() * availableNumbers.length)];
+            
+            countArea.querySelector('h2').innerText = `أين رقم ${currentQuizNumber.word}؟ 🤔`;
+            speakFusha(`أين رقم ${currentQuizNumber.word}؟`);
+            
+            // Remove highlight from previous quiz
+            document.querySelectorAll('.number-card').forEach(c => c.classList.remove('active'));
+        }
+
+        function checkQuizAnswer(chosenItem, cardElement) {
+            if (chosenItem.n === currentQuizNumber.n) {
+                cardElement.classList.add('active'); // Highlight correct answer
+                speakFusha("أحسنت! إجابة صحيحة");
+                giveStar(); // Award a star for correct quiz answer
+                quizCounter++;
+                if (quizCounter % 3 === 0) { // After 3 correct quizzes, offer to go back to learn mode or continue
+                    speakFusha("أنت ذكي جداً! هل تريد الاستمرار في الاختبار أم العودة للتعلم؟");
+                    setTimeout(() => {
+                        if (confirm("أنت ذكي جداً! هل تريد الاستمرار في الاختبار أم العودة للتعلم؟")) {
+                            generateQuiz();
+                        } else {
+                            gameMode = 'learn';
+                            countArea.innerHTML = `<h2 class="text-2xl text-slate-400 font-bold w-full text-center">اضغط على رقم لنتعلمه معاً!</h2>`;
+                            createGrid(); // Re-render grid for learn mode
+                        }
+                    }, 1500);
+                } else {
+                    setTimeout(generateQuiz, 1500);
+                }
+            } else {
+                speakFusha("حاول مرة أخرى يا بطل");
+            }
+        }
+
+        window.onload = () => {
+            createGrid();
+            setTimeout(() => {
+                speakFusha("مرحباً بك في عالم الأرقام! اضغط على أي رقم لنتعلم كيف نعد الأشياء");
+            }, 500);
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أطعم الأرنب الجائع 🥕 | لعبة تعليمية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: #fdf2f8; /* وردي فاتح جداً */
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* حاوية الأرنب */
+        .bunny-box {
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes eat {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.2) rotate(5deg); }
+            75% { transform: scale(1.1) rotate(-5deg); }
+        }
+        .bunny-eating { animation: eat 0.6s ease; }
+        
+        .bunny-sad {
+            animation: shake 0.5s;
+            filter: sepia(0.5) saturate(2);
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        /* كروت الطعام */
+        .food-item {
+            touch-action: none;
+            cursor: grab;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .food-item:active { cursor: grabbing; }
+        .food-item:hover { transform: scale(1.1); background: white; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+
+        /* Particle effect */
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            animation: particle-pop 0.8s ease-out forwards;
+            font-size: 1.5rem;
+        }
+        @keyframes particle-pop {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+        }
+    </style>
+</head>
+<body class="p-4 flex flex-col items-center">
+
+    <nav class="w-full max-w-4xl flex justify-between items-center mb-6">
+        <a href="child-dashboard.html" class="bg-white px-6 py-2 rounded-2xl shadow-md font-bold text-pink-500 hover:bg-pink-50 transition">🏠 العودة</a>
+        <div class="bg-white px-6 py-2 rounded-2xl shadow-md font-black text-amber-500 text-xl border-b-4 border-amber-200">
+            ⭐ <span id="stars-count">0</span>
+        </div>
+    </nav>
+
+    <div class="flex flex-col items-center mb-10">
+        <div id="bunny-target" class="bunny-box bg-white/40 w-64 h-64 rounded-full flex items-center justify-center border-8 border-dashed border-pink-200 relative">
+            <div id="bunny-emoji" class="text-[10rem] select-none">🐰</div>
+            <div id="bubble" class="absolute -top-10 bg-white px-4 py-2 rounded-2xl shadow-lg font-bold text-pink-600 border-2 border-pink-100 hidden">
+                لذيذ جداً! 😋
+            </div>
+        </div>
+        <h2 class="mt-4 text-2xl font-black text-pink-800">اسحب الطعام إلى فم الأرنب!</h2>
+    </div>
+
+    <div id="food-shelf" class="grid grid-cols-4 sm:grid-cols-6 gap-4 p-6 bg-white/60 rounded-[40px] shadow-inner max-w-4xl w-full border-4 border-white">
+        </div>
+
+    <script>
+        const foodData = [
+            { id: 1, char: '🥕', isFood: true, name: 'جزرة' },
+            { id: 2, char: '🍎', isFood: true, name: 'تفاحة' },
+            { id: 3, char: '👟', isFood: false, name: 'حذاء' },
+            { id: 4, char: '🍌', isFood: true, name: 'موزة' },
+            { id: 5, char: '🥦', isFood: true, name: 'بروكلي' },
+            { id: 6, char: '🔋', isFood: false, name: 'بطارية' },
+            { id: 7, char: '🍉', isFood: true, name: 'بطيخ' },
+            { id: 8, char: '🔑', isFood: false, name: 'مفتاح' },
+            { id: 9, char: '🍓', isFood: true, name: 'فراولة' },
+            { id: 10, char: '🪨', isFood: false, name: 'حجر' },
+        ];
+
+        let stars = JSON.parse(localStorage.getItem('gameProgress') || '{"stars":0}').stars;
+        document.getElementById('stars-count').innerText = stars;
+
+        const shelf = document.getElementById('food-shelf');
+        const bunnyTarget = document.getElementById('bunny-target');
+        const bunnyEmoji = document.getElementById('bunny-emoji');
+        const bubble = document.getElementById('bubble');
+
+        function speakFusha(text) {
+            window.speechSynthesis.cancel();
+            const msg = new SpeechSynthesisUtterance(text);
+            msg.lang = 'ar-SA';
+            msg.pitch = 1.3;
+            window.speechSynthesis.speak(msg);
+        }
+        
+        function createParticles(x, y) {
+            for(let i = 0; i < 8; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.innerText = '⭐';
+                p.style.left = x + 'px';
+                p.style.top = y + 'px';
+                p.style.setProperty('--dx', (Math.random() - 0.5) * 200 + 'px');
+                p.style.setProperty('--dy', (Math.random() - 0.5) * 200 + 'px');
+                document.body.appendChild(p);
+                setTimeout(() => p.remove(), 800);
+            }
+        }
+
+        // إنشاء العناصر في الرف
+        function initGame() {
+            shelf.innerHTML = '';
+            const shuffled = [...foodData].sort(() => Math.random() - 0.5);
+            
+            shuffled.forEach(item => {
+                const div = document.createElement('div');
+                div.className = "food-item bg-white/90 w-20 h-20 flex items-center justify-center rounded-3xl shadow-md text-4xl border-b-4 border-pink-100";
+                div.innerText = item.char;
+                div.draggable = true;
+
+                div.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', JSON.stringify(item));
+                    div.classList.add('opacity-50');
+                });
+                div.addEventListener('dragend', () => div.classList.remove('opacity-50'));
+
+                // Improved Touch Support
+                div.addEventListener('touchstart', (e) => {
+                    const touch = e.touches[0];
+                    div.style.position = 'fixed';
+                    div.style.zIndex = '1000';
+                    moveAt(touch.pageX, touch.pageY);
+
+                    function moveAt(pageX, pageY) {
+                        div.style.left = pageX - div.offsetWidth / 2 + 'px';
+                        div.style.top = pageY - div.offsetHeight / 2 + 'px';
+                    }
+
+                    function onTouchMove(event) {
+                        moveAt(event.touches[0].pageX, event.touches[0].pageY);
+                    }
+
+                    document.addEventListener('touchmove', onTouchMove);
+
+                    div.ontouchend = (event) => {
+                        document.removeEventListener('touchmove', onTouchMove);
+                        const bunnyRect = bunnyTarget.getBoundingClientRect();
+                        const touchEnd = event.changedTouches[0];
+                        
+                        if (touchEnd.pageX > bunnyRect.left && touchEnd.pageX < bunnyRect.right &&
+                            touchEnd.pageY > bunnyRect.top && touchEnd.pageY < bunnyRect.bottom) {
+                            handleAction(item);
+                            div.remove();
+                        } else {
+                            div.style.position = 'static';
+                        }
+                    };
+                };
+
+                shelf.appendChild(div);
+            });
+        }
+
+        // أحداث الإسقاط على الأرنب
+        bunnyTarget.ondragover = (e) => e.preventDefault();
+
+        bunnyTarget.ondrop = (e) => {
+            e.preventDefault();
+            const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+            handleAction(data);
+        };
+
+        function handleAction(item) {
+            if (item.isFood) {
+                bunnyEmoji.innerText = '😋';
+                bunnyTarget.classList.add('bunny-eating');
+                bubble.innerText = "هذا الـ " + item.name + " لذيذ جداً!";
+                bubble.classList.remove('hidden');
+                
+                const rect = bunnyTarget.getBoundingClientRect();
+                createParticles(rect.left + rect.width/2, rect.top + rect.height/2);
+                
+                speakFusha("شكراً لك! أنا أحب الـ " + item.name);
+                
+                stars += 5;
+                updateStats();
+                
+                setTimeout(() => {
+                    bunnyEmoji.innerText = '🐰';
+                    bunnyTarget.classList.remove('bunny-eating');
+                    bubble.classList.add('hidden');
+                }, 1500);
+
+            } else {
+                // استجابة خاطئة
+                bunnyEmoji.innerText = '🤢';
+                bunnyTarget.classList.add('bunny-sad');
+                speakFusha("عذراً، أنا لا آكل الـ " + item.name + ".. هذا ليس طعاماً!");
+                
+                setTimeout(() => {
+                    bunnyEmoji.innerText = '🐰';
+                    bunnyTarget.classList.remove('bunny-sad');
+                }, 1000);
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('stars-count').innerText = stars;
+            localStorage.setItem('gameProgress', JSON.stringify({stars: stars}));
+        }
+
+        window.onload = () => {
+            initGame();
+            setTimeout(() => speakFusha("أنا جائع جداً! هل يمكنك سحب الطعام المفيد ووضعه في فمي؟"), 500);
+        };
+    </script>
+</body>
+</html>

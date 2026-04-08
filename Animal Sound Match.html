@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>مين صاحب الصوت؟ 🐶 | Kids Learning</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #6c5ce7;
+            --card-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+            background: var(--bg);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+            background-image: radial-gradient(circle, #8278da 2px, transparent 2px);
+            background-size: 40px 40px;
+        }
+
+        .header {
+            padding: 20px;
+            text-align: center;
+            color: white;
+            text-shadow: 2px 2px 0px #00000022;
+        }
+
+        /* حاوية اللعب */
+        .game-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 25px;
+            width: 90%;
+            max-width: 800px;
+        }
+
+        /* كروت الحيوانات العملاقة */
+        .animal-card {
+            background: white;
+            border-radius: 50px;
+            width: 280px;
+            height: 380px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 10px solid #ffffff;
+            box-shadow: var(--card-shadow);
+        }
+
+        .animal-card:hover { transform: translateY(-10px); }
+        .animal-card:active { transform: scale(0.9); }
+
+        .animal-emoji { font-size: 9rem; margin-bottom: 20px; filter: drop-shadow(0 5px 5px #0002); }
+        .animal-name { font-size: 2.5rem; color: #2d3436; font-weight: 900; }
+
+        /* زر إعادة الاستماع */
+        .replay-btn {
+            background: #fab1a0;
+            border: none;
+            padding: 18px 50px;
+            border-radius: 60px;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #d63031;
+            cursor: pointer;
+            margin-bottom: 50px;
+            box-shadow: 0 8px 0 #e17055;
+            transition: 0.1s;
+        }
+
+        .replay-btn:active { transform: translateY(5px); box-shadow: none; }
+
+        .score-badge {
+            position: fixed; top: 20px; right: 20px;
+            background: #ffeaa7; padding: 12px 30px; border-radius: 50px;
+            font-weight: 900; font-size: 1.5rem; border-bottom: 5px solid #fdcb6e;
+        }
+
+        /* أنيميشن النجاح */
+        @keyframes success {
+            0% { transform: scale(1); border-color: #55efc4; }
+            50% { transform: scale(1.15); border-color: #00b894; }
+            100% { transform: scale(1); border-color: #55efc4; }
+        }
+        .correct { animation: success 0.6s ease infinite; border-color: #55efc4 !important; }
+    </style>
+</head>
+<body>
+
+    <div class="score-badge">⭐ <span id="stars">0</span></div>
+
+    <div class="header">
+        <h1>يا بطل.. لمن هذا الصوت؟ 🎧</h1>
+    </div>
+
+    <div class="game-container" id="cards-area"></div>
+
+    <button class="replay-btn" onclick="playSound()">🔊 استمع مرة أخرى</button>
+
+    <script>
+        const animals = [
+            { name: 'القطة', emoji: '🐱', sound: 'مياو مياو نياو', greeting: 'أحسنت.. هذه هي القطة' },
+            { name: 'الكلب', emoji: '🐶', sound: 'هوهو هوهو هوهو', greeting: 'رائع.. هذا هو الكلب' },
+            { name: 'البطة', emoji: '🦆', sound: 'واك واك واك', greeting: 'صحيح.. هذه هي البطة الجميلة' },
+            { name: 'الأسد', emoji: '🦁', sound: 'روووورررر روووورررر', greeting: 'ممتاز يا بطل.. هذا الأسد ملك الغابة' },
+            { name: 'الخروف', emoji: '🐑', sound: 'ماء ماء ماء', greeting: 'أحسنت.. هذا هو الخروف' },
+            { name: 'الدجاجة', emoji: '🐔', sound: 'كاك كاك كاك', greeting: 'رائع.. هذه هي الدجاجة' }
+        ];
+
+        let currentTarget;
+        let canClick = true;
+        let stars = JSON.parse(localStorage.getItem('gameProgress') || '{"stars": 0}').stars;
+        document.getElementById('stars').innerText = stars;
+
+        function initLevel() {
+            canClick = true;
+            const area = document.getElementById('cards-area');
+            area.innerHTML = '';
+            
+            let shuffled = [...animals].sort(() => 0.5 - Math.random());
+            let choices = shuffled.slice(0, 2);
+            currentTarget = choices[Math.floor(Math.random() * 2)];
+
+            choices.forEach(animal => {
+                const card = document.createElement('div');
+                card.className = 'animal-card';
+                card.innerHTML = `
+                    <div class="animal-emoji">${animal.emoji}</div>
+                    <div class="animal-name">${animal.name}</div>
+                `;
+                card.onclick = () => checkAnswer(animal, card);
+                area.appendChild(card);
+            });
+
+            setTimeout(() => speakMessage("استمع جيداً.. لمن هذا الصوت؟"), 500);
+            setTimeout(playSound, 2000);
+        }
+
+        function playSound() {
+            const msg = new SpeechSynthesisUtterance(currentTarget.sound);
+            msg.lang = 'ar-SA';
+            msg.rate = 0.8;
+            msg.pitch = 1.2;
+            window.speechSynthesis.speak(msg);
+        }
+
+        function checkAnswer(selected, cardElement) {
+            if (!canClick) return;
+
+            if (selected.name === currentTarget.name) {
+                canClick = false;
+                cardElement.classList.add('correct');
+                stars += 5; // زودنا الجايزة لـ 5 نجوم
+                updateUI();
+                
+                speakMessage(selected.greeting);
+                
+                setTimeout(initLevel, 3000);
+            } else {
+                cardElement.style.borderColor = '#ff7675';
+                speakMessage("خطأ.. حاول مرة أخرى يا بطل");
+                setTimeout(() => cardElement.style.borderColor = '#ffffff', 800);
+            }
+        }
+
+        function speakMessage(text) {
+            window.speechSynthesis.cancel();
+            const msg = new SpeechSynthesisUtterance(text);
+            msg.lang = 'ar-SA'; // نطق فصحى
+            msg.rate = 0.9;
+            msg.pitch = 1.1;
+            window.speechSynthesis.speak(msg);
+        }
+
+        function updateUI() {
+            document.getElementById('stars').innerText = stars;
+            localStorage.setItem('gameProgress', JSON.stringify({stars: stars}));
+        }
+
+        window.onload = initLevel;
+    </script>
+</body>
+</html>

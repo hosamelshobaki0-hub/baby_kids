@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>درس الألوان | تعليمي</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="age-kid">
+  <nav class="header">
+    <div class="logo">🎨 درس الألوان</div>
+    <div>
+      <a href="child-dashboard.html" class="nav-btn">🏠 الرئيسية</a>
+      <a href="games.html" class="nav-btn">⭐ ألعاب</a>
+    </div>
+  </nav>
+
+  <div class="max-w-4xl mx-auto p-8">
+    <div class="card mb-8">
+      <h1 class="text-4xl font-bold text-center mb-8">تعلم الألوان 🌈</h1>
+      <p class="text-xl text-center mb-12">اضغط على كل لون لتسمع اسمه!</p>
+      
+      <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+        <div class="color-card p-8 rounded-3xl text-center cursor-pointer hover:scale-110 transition-all" onclick="playSound('أحمر')" style="background: #ff4757">
+          <div class="text-4xl mb-4">🔴</div>
+          <div class="text-2xl font-bold text-white">أحمر</div>
+        </div>
+        <div class="color-card p-8 rounded-3xl text-center cursor-pointer hover:scale-110 transition-all" onclick="playSound('أزرق')" style="background: #3742fa">
+          <div class="text-4xl mb-4">🔵</div>
+          <div class="text-2xl font-bold text-white">أزرق</div>
+        </div>
+        <div class="color-card p-8 rounded-3xl text-center cursor-pointer hover:scale-110 transition-all" onclick="playSound('أصفر')" style="background: #ffa502">
+          <div class="text-4xl mb-4">🟡</div>
+          <div class="text-2xl font-bold text-white">أصفر</div>
+        </div>
+        <div class="color-card p-8 rounded-3xl text-center cursor-pointer hover:scale-110 transition-all" onclick="playSound('أخضر')" style="background: #2ed573">
+          <div class="text-4xl mb-4">🟢</div>
+          <div class="text-2xl font-bold text-white">أخضر</div>
+        </div>
+        <div class="color-card p-8 rounded-3xl text-center cursor-pointer hover:scale-110 transition-all" onclick="playSound('بنفسجي')" style="background: #5f27cd">
+          <div class="text-4xl mb-4">🟣</div>
+          <div class="text-2xl font-bold text-white">بنفسجي</div>
+        </div>
+        <div class="color-card p-8 rounded-3xl text-center cursor-pointer hover:scale-110 transition-all" onclick="playSound('برتقالي')" style="background: #ff6348">
+          <div class="text-4xl mb-4">🟠</div>
+          <div class="text-2xl font-bold text-white">برتقالي</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="text-3xl font-bold mb-8 text-center">اختبار سريع! 🎯</h2>
+      <div id="quiz-container" class="text-center">
+        <p class="text-xl mb-8">ما لون الشمس؟</p>
+        <div class="flex flex-wrap gap-4 justify-center">
+          <button onclick="checkAnswer('أحمر')" class="btn-primary px-8 py-4 m-2">أحمر</button>
+          <button onclick="checkAnswer('أصفر')" class="btn-primary px-8 py-4 m-2">أصفر</button>
+          <button onclick="checkAnswer('أزرق')" class="btn-primary px-8 py-4 m-2">أزرق</button>
+        </div>
+      </div>
+      
+      <div id="quiz-result" class="hidden mt-8 p-6 rounded-2xl text-xl font-bold text-center">
+        <!-- Result here -->
+      </div>
+    </div>
+
+    <div class="text-center mt-12">
+      <a href="games.html" class="btn-primary px-12 py-6 text-2xl inline-block">جاهز للألعاب؟ 🎮</a>
+    </div>
+  </div>
+
+  <script>
+    let score = 0;
+    
+    function playSound(color) {
+      // Speech Synthesis
+      const utterance = new SpeechSynthesisUtterance(color);
+      utterance.lang = 'ar-SA';
+      utterance.rate = 0.8;
+      speechSynthesis.speak(utterance);
+      
+      // Add star
+      score += 5;
+      updateStars();
+      
+      // Visual feedback
+      event.target.style.transform = 'scale(0.95)';
+      setTimeout(() => event.target.style.transform = '', 150);
+    }
+
+    function checkAnswer(answer) {
+      const correct = 'أصفر';
+      const result = document.getElementById('quiz-result');
+      result.classList.remove('hidden');
+      
+      if (answer === correct) {
+        result.innerHTML = 'صحيح! 🎉 +25 نجمة <div class="text-3xl mt-4">⭐⭐⭐⭐⭐</div>';
+        score += 25;
+      } else {
+        result.innerHTML = 'حاول مرة أخرى 😊 الإجابة الصحيحة: أصفر';
+      }
+      
+      updateStars();
+    }
+
+    function updateStars() {
+      const progress = JSON.parse(localStorage.getItem('gameProgress') || '{"stars": 0}');
+      progress.stars = (progress.stars || 0) + score;
+      localStorage.setItem('gameProgress', JSON.stringify(progress));
+    }
+
+    // Auto-play welcome
+    window.onload = () => {
+      speechSynthesis.speak(new SpeechSynthesisUtterance('مرحباً، هذا درس الألوان، اضغط على كل لون لتسمع اسمه'));
+    };
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لنتعلم الحروف العربية 📖</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Cairo', sans-serif; background: #f0fdf4; overflow-x: hidden; }
+    .letter-card {
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      cursor: pointer;
+      border-bottom: 8px solid #cbd5e1;
+    }
+    .letter-card:hover { 
+      transform: translateY(-10px) scale(1.05); 
+      border-color: #10b981;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+    .letter-card:active { transform: scale(0.95); }
+    
+    .star-pop { 
+      animation: starPop 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; 
+      position: fixed;
+      pointer-events: none;
+    }
+    @keyframes starPop {
+      0% { transform: translate(-50%, -50%) scale(0) rotate(0deg); opacity: 0; }
+      50% { transform: translate(-50%, -50%) scale(2) rotate(180deg); opacity: 1; }
+      100% { transform: translate(-50%, -150%) scale(1) rotate(360deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body class="p-4 md:p-8">
+
+  <nav class="max-w-5xl mx-auto flex justify-between items-center mb-10">
+    <a href="roadmap.html" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-2xl font-black shadow-lg transition-all flex items-center gap-2">
+      <span>⬅️</span> العودة للخريطة
+    </a>
+    <div class="bg-white px-8 py-3 rounded-3xl shadow-md border-b-4 border-yellow-400 flex items-center gap-3">
+      <span class="text-2xl">⭐</span>
+      <span id="star-count-ui" class="text-2xl font-black text-emerald-900">0</span>
+    </div>
+  </nav>
+
+  <div class="max-w-6xl mx-auto grid grid-cols-3 sm:grid-cols-4 md:grid-cols-7 gap-5" id="alphabet-grid">
+    </div>
+
+  <script>
+    const alphabet = [
+      { char: 'أ', name: 'أرنب', icon: '🐰', sound: 'ألف' }, 
+      { char: 'ب', name: 'بطة', icon: '🦆', sound: 'باء' },
+      { char: 'ت', name: 'تفاحة', icon: '🍎', sound: 'تاء' }, 
+      { char: 'ث', name: 'ثعلب', icon: '🦊', sound: 'ثاء' },
+      { char: 'ج', name: 'جمل', icon: '🐪', sound: 'جيم' }, 
+      { char: 'ح', name: 'حصان', icon: '🐎', sound: 'حاء' },
+      { char: 'خ', name: 'خروف', icon: '🐑', sound: 'خاء' }, 
+      { char: 'د', name: 'ديك', icon: '🐓', sound: 'دال' },
+      { char: 'ذ', name: 'ذرة', icon: '🌽', sound: 'ذال' }, 
+      { char: 'ر', name: 'رمان', icon: '🍎', sound: 'راء' },
+      { char: 'ز', name: 'زرافة', icon: '🦒', sound: 'زاي' }, 
+      { char: 'س', name: 'سمكة', icon: '🐟', sound: 'سين' },
+      { char: 'ش', name: 'شمس', icon: '☀️', sound: 'شين' }, 
+      { char: 'ص', name: 'صقر', icon: '🦅', sound: 'صاد' },
+      { char: 'ض', name: 'ضفدع', icon: '🐸', sound: 'ضاد' }, 
+      { char: 'ط', name: 'طائرة', icon: '✈️', sound: 'طاء' },
+      { char: 'ظ', name: 'ظرف', icon: '✉️', sound: 'ظاء' }, 
+      { char: 'ع', name: 'عين', icon: '👁️', sound: 'عين' },
+      { char: 'غ', name: 'غزالة', icon: '🦌', sound: 'غين' }, 
+      { char: 'ف', name: 'فيل', icon: '🐘', sound: 'فاء' },
+      { char: 'ق', name: 'قرد', icon: '🐒', sound: 'قاف' }, 
+      { char: 'ك', name: 'كلب', icon: '🐕', sound: 'كاف' },
+      { char: 'ل', name: 'ليمون', icon: '🍋', sound: 'لام' }, 
+      { char: 'م', name: 'موز', icon: '🍌', sound: 'ميم' },
+      { char: 'ن', name: 'نحلة', icon: '🐝', sound: 'نون' }, 
+      { char: 'هـ', name: 'هلال', icon: '🌙', sound: 'هاء' },
+      { char: 'و', name: 'وردة', icon: '🌹', sound: 'واو' }, 
+      { char: 'ي', name: 'يد', icon: '✋', sound: 'ياء' }
+    ];
+
+    const grid = document.getElementById('alphabet-grid');
+    let tapCounter = 0;
+
+    function updateStarUI() {
+        const data = JSON.parse(localStorage.getItem('gameProgress') || '{"stars":0}');
+        document.getElementById('star-count-ui').innerText = data.stars;
+    }
+
+    function speakFusha(text) {
+        window.speechSynthesis.cancel();
+        const msg = new SpeechSynthesisUtterance(text);
+        msg.lang = 'ar-SA'; // اللغة العربية الفصحى
+        msg.rate = 0.8;
+        msg.pitch = 1.2;
+        window.speechSynthesis.speak(msg);
+    }
+
+    alphabet.forEach((item) => {
+      const card = document.createElement('div');
+      card.className = "letter-card bg-white p-6 rounded-[35px] shadow-lg text-center";
+      card.innerHTML = `
+        <div class="text-6xl font-black text-emerald-600 mb-3">${item.char}</div>
+        <div class="text-3xl filter drop-shadow-sm">${item.icon}</div>
+      `;
+      
+      card.onclick = () => {
+        speakFusha(`حرف الـ ${item.sound} ... ${item.name}`);
+        
+        card.classList.add('bg-emerald-50');
+        setTimeout(() => card.classList.remove('bg-emerald-50'), 300);
+        
+        tapCounter++;
+        if (tapCounter % 5 === 0) {
+            giveStar();
+        }
+      };
+      
+      grid.appendChild(card);
+    });
+
+    function giveStar() {
+        const appData = JSON.parse(localStorage.getItem('gameProgress') || '{"stars":0}');
+        appData.stars += 1;
+        localStorage.setItem('gameProgress', JSON.stringify(appData));
+        updateStarUI();
+        
+        const star = document.createElement('div');
+        star.className = "fixed top-1/2 left-1/2 text-9xl star-pop z-50";
+        star.innerText = "⭐";
+        document.body.appendChild(star);
+        
+        const cheers = [
+            "أحسنت يا بطل! لقد نلت نجمة",
+            "عمل رائع.. خذ هذه النجمة مكافأة لك",
+            "أنت طفل ذكي جداً.. مبارك لك",
+            "استمر في التعلم.. أنت تتقدم بشكل ممتاز"
+        ];
+        const randomCheer = cheers[Math.floor(Math.random() * cheers.length)];
+        speakFusha(randomCheer);
+        
+        setTimeout(() => star.remove(), 1200);
+    }
+
+    window.onload = () => {
+        updateStarUI();
+        setTimeout(() => speakFusha("هيا يا بطل.. اضغط على الحرف لكي تتعلم نُطقه الصحيح"), 500);
+    };
+  </script>
+</body>
+</html>

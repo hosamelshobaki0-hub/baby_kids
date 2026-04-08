@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مغامرة التعلم الذكي | Kids Learning</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6c5ce7;
+            --success-color: #00b894;
+            --bg-gradient: linear-gradient(135deg, #74b9ff, #a29bfe);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body { 
+            font-family: 'Cairo', sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh; 
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+        }
+
+        /* شريط التقدم العلوي */
+        .progress-wrapper {
+            position: fixed; top: 20px; left: 50%;
+            transform: translateX(-50%);
+            width: 85%; max-width: 600px;
+            height: 18px; background: rgba(255,255,255,0.3);
+            border-radius: 20px; border: 3px solid white;
+            z-index: 100;
+        }
+        #progress-bar {
+            width: 0%; height: 100%;
+            background: #ff7675; border-radius: 15px;
+            transition: width 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .lesson-card {
+            background: white; padding: 40px; border-radius: 50px;
+            box-shadow: 0 20px 0 rgba(0,0,0,0.1);
+            text-align: center; width: 90%; max-width: 550px;
+            position: relative; animation: slideUp 0.6s ease-out;
+        }
+
+        .lesson-title { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 10px; font-weight: 700; }
+        
+        .lesson-visual { 
+            font-size: 8rem; margin: 20px 0; display: block;
+            filter: drop-shadow(0 10px 10px rgba(0,0,0,0.1));
+        }
+
+        .lesson-content { 
+            font-size: 1.8rem; color: #2d3436; margin-bottom: 30px; 
+            min-height: 120px; display: flex; align-items: center; justify-content: center;
+            font-weight: 900;
+        }
+
+        .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .full-width { grid-column: span 2; }
+
+        .kid-btn { 
+            background: #00b894; border: none; padding: 18px; border-radius: 25px;
+            color: white; font-size: 1.3rem; font-weight: 900;
+            cursor: pointer; box-shadow: 0 8px 0 #009475; transition: 0.2s;
+        }
+        .kid-btn:active { transform: translateY(4px); box-shadow: 0 3px 0 #009475; }
+        .btn-audio { background: #6c5ce7; box-shadow: 0 8px 0 #4834d4; }
+        .btn-home { background: #fdcb6e; box-shadow: 0 8px 0 #d3a44d; margin-top: 10px; }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
+        .bounce { animation: bounce 0.8s infinite alternate; }
+        @keyframes bounce { from { transform: scale(1); } to { transform: scale(1.1); } }
+    </style>
+</head>
+<body>
+
+    <div class="progress-wrapper">
+        <div id="progress-bar"></div>
+    </div>
+
+    <div class="lesson-card" id="main-card">
+        <h1 id="group-title" class="lesson-title">جاري التحميل...</h1>
+        <div id="lesson-visual" class="lesson-visual bounce">🌟</div>
+        <div id="lesson-content" class="lesson-content">جاهز للمغامرة؟</div>
+
+        <div class="controls">
+            <button class="kid-btn btn-audio" onclick="repeatAudio()">👂 اسمع تاني</button>
+            <button id="next-btn" class="kid-btn" onclick="handleNext()">التالي ⬅️</button>
+            <button class="kid-btn btn-home full-width" onclick="goHome()">🏠 خروج</button>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const lessonType = urlParams.get('type') || 'colors';
+
+        // قاعدة البيانات الكبرى (4 مجموعات × 10 خطوات = 40 درساً)
+        const groupsDB = {
+            'colors': {
+                title: 'رحلة الألوان 🎨',
+                steps: [
+                    { v: '🔴', t: 'هذا هو اللون الأحمر' }, { v: '🔵', t: 'هذا هو اللون الأزرق' },
+                    { v: '🟢', t: 'هذا هو اللون الأخضر' }, { v: '🟡', t: 'هذا هو اللون الأصفر' },
+                    { v: '🟠', t: 'هذا هو اللون البرتقالي' }, { v: '🟣', t: 'هذا هو اللون البنفسجي' },
+                    { v: '🟤', t: 'هذا هو اللون البني' }, { v: '⚫', t: 'هذا هو اللون الأسود' },
+                    { v: '⚪', t: 'هذا هو اللون الأبيض' }, { v: '💗', t: 'هذا هو اللون الوردي' }
+                ]
+            },
+            'numbers': {
+                title: 'مغامرة الأرقام 🔢',
+                steps: [
+                    { v: '1️⃣', t: 'رقم واحد' }, { v: '2️⃣', t: 'رقم اثنان' }, { v: '3️⃣', t: 'رقم ثلاثة' },
+                    { v: '4️⃣', t: 'رقم أربعة' }, { v: '5️⃣', t: 'رقم خمسة' }, { v: '6️⃣', t: 'رقم ستة' },
+                    { v: '7️⃣', t: 'رقم سبعة' }, { v: '8️⃣', t: 'رقم ثمانية' }, { v: '9️⃣', t: 'رقم تسعة' },
+                    { v: '🔟', t: 'رقم عشرة' }
+                ]
+            },
+            'animals': {
+                title: 'عالم الحيوان 🦁',
+                steps: [
+                    { v: '🦁', t: 'هذا هو الأسد ملك الغابة' }, { v: '🐘', t: 'هذا هو الفيل الضخم' },
+                    { v: '🐒', t: 'هذا هو القرد الشقي' }, { v: '🦒', t: 'هذه هي الزرافة الطويلة' },
+                    { v: '🐰', t: 'هذا هو الأرنب السريع' }, { v: '🐱', t: 'هذه هي القطة الجميلة' },
+                    { v: '🐶', t: 'هذا هو الكلب الوفي' }, { v: '🐮', t: 'هذه هي البقرة الطيبة' },
+                    { v: '🐝', t: 'هذه هي النحلة النشيطة' }, { v: '🦋', t: 'هذه هي الفراشة الرائعة' }
+                ]
+            },
+            'fruits': {
+                title: 'سلة الفواكه 🍎',
+                steps: [
+                    { v: '🍎', t: 'تفاحة حمراء مفيدة' }, { v: '🍌', t: 'موز أصفر لذيذ' },
+                    { v: '🍇', t: 'عنب بنفسجي حلو' }, { v: '🍉', t: 'بطيخ منعش وجميل' },
+                    { v: '🍓', t: 'فراولة حمراء صغيرة' }, { v: '🥭', t: 'مانجو لذيذة جداً' },
+                    { v: '🍊', t: 'برتقال مفيد للصحة' }, { v: '🍍', t: 'أناناس طعمه رائع' },
+                    { v: '🍒', t: 'كرز أحمر جميل' }, { v: '🍐', t: 'كمثرى طعمها حلو' }
+                ]
+            }
+        };
+
+        let currentStep = 0;
+        const groupData = groupsDB[lessonType] || groupsDB['colors'];
+
+        function init() {
+            document.getElementById('group-title').innerText = groupData.title;
+            updateUI();
+        }
+
+        function updateUI() {
+            const step = groupData.steps[currentStep];
+            const content = document.getElementById('lesson-content');
+            const visual = document.getElementById('lesson-visual');
+            const bar = document.getElementById('progress-bar');
+            
+            content.style.opacity = 0;
+            setTimeout(() => {
+                content.innerText = step.t;
+                visual.innerText = step.v;
+                content.style.opacity = 1;
+                speak(step.t);
+            }, 200);
+
+            const progress = ((currentStep + 1) / groupData.steps.length) * 100;
+            bar.style.width = progress + "%";
+            
+            if (currentStep === groupData.steps.length - 1) {
+                document.getElementById('next-btn').innerText = "إنهاء 🏆";
+            }
+        }
+
+        function handleNext() {
+            if (currentStep < groupData.steps.length - 1) {
+                currentStep++;
+                updateUI();
+            } else {
+                finishLesson();
+            }
+        }
+
+        function repeatAudio() { speak(groupData.steps[currentStep].t); }
+
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const msg = new SpeechSynthesisUtterance(text);
+                msg.lang = 'ar-SA';
+                msg.rate = 0.85; 
+                window.speechSynthesis.speak(msg);
+            }
+        }
+
+        function finishLesson() {
+            let progress = JSON.parse(localStorage.getItem('gameProgress') || '{"stars": 0, "lessons": []}');
+            progress.stars += 20; // مكافأة المجموعة الكاملة
+            if(!progress.lessons.includes(lessonType)) progress.lessons.push(lessonType);
+            localStorage.setItem('gameProgress', JSON.stringify(progress));
+
+            document.getElementById('main-card').innerHTML = `
+                <h1 style="font-size:5rem">🏆</h1>
+                <h2>أنت بطل حقيقي!</h2>
+                <p style="margin:20px 0">أنهيت ${groupData.title} <br> وحصلت على 20 نجمة ⭐</p>
+            `;
+            speak("أحسنت يا بطل! لقد حصلت على عشرين نجمة");
+        }
+
+        function goHome() { window.location.href = 'learning.html'; }
+
+        window.onload = init;
+    </script>
+</body>
+</html>

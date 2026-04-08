@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مغامرة الطعام الصحي 🍏</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #d1fae5, #86efac);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .food-item {
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .food-item:hover { transform: scale(1.2) rotate(5deg); }
+
+        .drop-zone {
+            transition: all 0.3s ease;
+            border: 4px dashed rgba(0,0,0,0.1);
+        }
+        .drop-zone:hover { transform: scale(1.02); background: rgba(255,255,255,0.9); }
+
+        @keyframes success-jump {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        .success-animate { animation: success-jump 0.5s ease; }
+    </style>
+</head>
+<body class="p-4 md:p-8 flex flex-col items-center">
+
+    <header class="w-full max-w-4xl flex justify-between items-center mb-8 bg-white/80 backdrop-blur p-5 rounded-[30px] shadow-lg">
+        <a href="learning-menu.html" class="bg-emerald-600 text-white px-6 py-2 rounded-2xl font-bold">⬅️ عودة</a>
+        <h1 class="text-2xl font-black text-emerald-800">لعبة الطعام الذكي 🥗</h1>
+        <div class="bg-amber-100 px-4 py-2 rounded-2xl border-2 border-amber-200 font-bold text-amber-700">
+            ⭐ <span id="stars">0</span>
+        </div>
+    </header>
+
+    <main class="w-full max-w-5xl grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+        
+        <div id="healthy-zone" class="drop-zone bg-white/60 p-6 rounded-[40px] text-center min-h-[300px] flex flex-col items-center">
+            <div class="text-6xl mb-4">😋</div>
+            <h2 class="text-2xl font-black text-emerald-600 mb-4">طعام صحي مفيد</h2>
+            <div id="healthy-list" class="flex flex-wrap justify-center gap-3"></div>
+        </div>
+
+        <div class="flex flex-col items-center justify-center space-y-6">
+            <div class="bg-white p-10 rounded-[50px] shadow-2xl border-b-8 border-emerald-100 text-center w-full">
+                <div id="current-food-icon" class="text-9xl mb-4 food-item">🍎</div>
+                <p id="food-name" class="text-2xl font-black text-slate-700">تفاحة</p>
+            </div>
+            <div class="flex gap-4 w-full">
+                <button onclick="checkFood(true)" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white py-4 rounded-3xl font-black text-xl shadow-lg">صحّي ✅</button>
+                <button onclick="checkFood(false)" class="flex-1 bg-rose-500 hover:bg-rose-600 text-white py-4 rounded-3xl font-black text-xl shadow-lg">مضر ❌</button>
+            </div>
+        </div>
+
+        <div id="unhealthy-zone" class="drop-zone bg-white/60 p-6 rounded-[40px] text-center min-h-[300px] flex flex-col items-center">
+            <div class="text-6xl mb-4">🥴</div>
+            <h2 class="text-2xl font-black text-rose-600 mb-4">طعام غير صحي</h2>
+            <div id="unhealthy-list" class="flex flex-wrap justify-center gap-3"></div>
+        </div>
+
+    </main>
+
+    <script>
+        const foodLibrary = [
+            { name: 'تفاحة', icon: '🍎', healthy: true },
+            { name: 'بيتزا', icon: '🍕', healthy: false },
+            { name: 'جزر', icon: '🥕', healthy: true },
+            { name: 'دونات', icon: '🍩', healthy: false },
+            { name: 'موز', icon: '🍌', healthy: true },
+            { name: 'مشروبات غازية', icon: '🥤', healthy: false },
+            { name: 'بروكلي', icon: '🥦', healthy: true },
+            { name: 'بطاطس مقلية', icon: '🍟', healthy: false },
+            { name: 'حليب', icon: '🥛', healthy: true },
+            { name: 'حلوى ملونة', icon: '🍭', healthy: false }
+        ];
+
+        let currentIndex = 0;
+        let stars = JSON.parse(localStorage.getItem('gameProgress') || '{"stars":0}').stars;
+        document.getElementById('stars').innerText = stars;
+
+        function speak(text) {
+            window.speechSynthesis.cancel();
+            const msg = new SpeechSynthesisUtterance(text);
+            msg.lang = 'ar-SA';
+            window.speechSynthesis.speak(msg);
+        }
+
+        function loadFood() {
+            if (currentIndex >= foodLibrary.length) {
+                finishGame();
+                return;
+            }
+            const food = foodLibrary[currentIndex];
+            document.getElementById('current-food-icon').innerText = food.icon;
+            document.getElementById('food-name').innerText = food.name;
+            speak(food.name);
+        }
+
+        function checkFood(isHealthyChoice) {
+            const food = foodLibrary[currentIndex];
+            const healthyList = document.getElementById('healthy-list');
+            const unhealthyList = document.getElementById('unhealthy-list');
+
+            if (isHealthyChoice === food.healthy) {
+                // إجابة صحيحة
+                stars += 5;
+                speak("أحسنت! هذا خيار ذكي");
+                const item = document.createElement('span');
+                item.className = "text-4xl success-animate";
+                item.innerText = food.icon;
+                
+                if (food.healthy) healthyList.appendChild(item);
+                else unhealthyList.appendChild(item);
+
+                currentIndex++;
+                updateProgress();
+                loadFood();
+            } else {
+                // إجابة خاطئة
+                speak("فكر مجدداً.. هل هذا مفيد حقاً لجسمنا؟");
+                document.getElementById('current-food-icon').classList.add('shake');
+                setTimeout(() => document.getElementById('current-food-icon').classList.remove('shake'), 500);
+            }
+        }
+
+        function updateProgress() {
+            document.getElementById('stars').innerText = stars;
+            localStorage.setItem('gameProgress', JSON.stringify({stars: stars}));
+        }
+
+        function finishGame() {
+            speak("يا لك من بطل! أنت الآن تعرف كيف تختار طعامك الصحي");
+            document.body.innerHTML = `
+                <div class="flex flex-col items-center justify-center min-h-screen text-center p-10">
+                    <h1 class="text-[120px]">🏆</h1>
+                    <h2 class="text-5xl font-black text-emerald-700 mb-6">خبير التغذية الصغير!</h2>
+                    <p class="text-2xl text-slate-600 mb-10">لقد ميزت بين الطعام المفيد والمضر بنجاح</p>
+                    <button onclick="window.location.href='learning-menu.html'" class="bg-emerald-600 text-white px-12 py-5 rounded-full text-2xl font-black shadow-2xl hover:scale-110 transition">العودة للدروس</button>
+                </div>
+            `;
+        }
+
+        window.onload = loadFood;
+    </script>
+
+    <style>
+        .shake { animation: shake 0.5s ease-in-out; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+    </style>
+</body>
+</html>

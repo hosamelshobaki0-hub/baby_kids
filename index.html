@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تعليمي - منصة تعليم عالمية لكل الأعمار</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="age-kid">
+  <div class="container" id="app">
+    <!-- Loading -->
+    <div id="loading" class="flex items-center justify-center min-h-screen">
+      <div class="text-4xl animate-spin">🌟</div>
+    </div>
+
+    <!-- Age Onboarding -->
+    <div id="age-onboarding" class="hidden flex items-center justify-center min-h-screen p-8">
+      <div class="max-w-4xl w-full grid md:grid-cols-2 gap-8">
+        <div>
+          <h1 class="text-5xl md:text-6xl font-bold mb-8">اختر فئتك العمرية 🎯</h1>
+          <p class="text-2xl mb-12 opacity-90">سيتم تخصيص التجربة حسب عمرك</p>
+        </div>
+        <div class="grid grid-cols-2 gap-6">
+          <div class="age-card" data-age="kid">
+            <div class="emoji text-6xl mb-4">👶</div>
+            <h3 class="text-2xl font-bold mb-2">الأطفال</h3>
+            <p class="opacity-80 mb-6">1-6 سنوات</p>
+            <button class="btn-primary w-full py-4 text-xl">ابدأ التعلم المرح</button>
+          </div>
+          <div class="age-card" data-age="teen">
+            <div class="emoji text-6xl mb-4">🧒</div>
+            <h3 class="text-2xl font-bold mb-2">المراهقون</h3>
+            <p class="opacity-80 mb-6">7-17 سنة</p>
+            <button class="btn-primary w-full py-4 text-xl">مهارات المستقبل</button>
+          </div>
+          <div class="age-card" data-age="adult" style="grid-column: span 2;">
+            <div class="emoji text-6xl mb-4">🧑‍💼</div>
+            <h3 class="text-2xl font-bold mb-2">الكبار</h3>
+            <p class="opacity-80 mb-6">18-60 سنة</p>
+            <button class="btn-primary w-full py-4 text-xl">تطوير مهني</button>
+          </div>
+          <div class="age-card" data-age="senior" style="grid-column: span 2;">
+            <div class="emoji text-6xl mb-4">👴</div>
+            <h3 class="text-2xl font-bold mb-2">كبار السن</h3>
+            <p class="opacity-80 mb-6">60+ سنة</p>
+            <button class="btn-primary w-full py-4 text-xl">تعلم مدى الحياة</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Login -->
+    <div id="login" class="hidden flex items-center justify-center min-h-screen p-8">
+      <div class="card max-w-md w-full">
+        <div class="text-center mb-12">
+          <h1 class="text-4xl font-bold mb-4">🌟 مرحباً</h1>
+          <p class="text-xl opacity-80">تسجيل الدخول</p>
+        </div>
+        <form id="loginForm" class="space-y-6">
+          <div class="relative">
+            <input type="email" id="email" placeholder="البريد الإلكتروني" class="w-full p-4 pl-12 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+          </div>
+          <div class="relative">
+            <input type="password" id="password" placeholder="كلمة المرور" class="w-full p-4 pl-12 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+          </div>
+          <button type="submit" class="btn-primary w-full py-4 text-lg font-bold">
+            دخول
+          </button>
+          <p class="text-center text-sm opacity-70 mt-4">
+            Demo: test@test.com / 123
+          </p>
+        </form>
+        <div id="loginError" class="hidden bg-red-100 border border-red-400 text-red-700 p-4 rounded-xl mt-6"></div>
+      </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="hidden">
+      <header class="header">
+        <div class="logo">🌟 تعليمي</div>
+        <div class="nav-buttons">
+          <button class="nav-btn active" data-view="dashboard">🏠</button>
+          <button class="nav-btn" data-view="games">⭐</button>
+          <button class="nav-btn" data-view="progress">📊</button>
+          <button class="nav-btn" data-view="social">👥</button>
+          <button class="nav-btn" data-view="profile">👤</button>
+          <button class="nav-btn" id="logoutBtn">🚪</button>
+        </div>
+      </header>
+
+      <!-- Welcome Card -->
+      <div class="max-w-4xl mx-auto p-8">
+        <div class="card text-center">
+          <h1 class="text-5xl font-bold mb-6" id="welcomeTitle">مرحباً بك!</h1>
+          <p class="text-xl opacity-80 mb-8" id="welcomeSubtitle">ابدأ رحلة التعلم اليوم</p>
+          <div class="grid md:grid-cols-3 gap-6 mb-12">
+            <div class="text-center p-6">
+              <div class="text-4xl mb-4" id="starsCount">125</div>
+              <div class="opacity-70">نجوم</div>
+            </div>
+            <div class="text-center p-6">
+              <div class="text-4xl mb-4" id="levelCount">12</div>
+              <div class="opacity-70">المستوى</div>
+            </div>
+            <div class="text-center p-6">
+              <div class="text-4xl mb-4" id="streakCount">7</div>
+              <div class="opacity-70">يوم متتالي</div>
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-4 justify-center">
+            <button class="btn-primary px-8 py-4 text-xl" onclick="showDailyChallenge()">التحدي اليومي 🎁</button>
+            <button class="btn-primary px-8 py-4 text-xl" onclick="showRecommendedLessons()">دروس موصى بها ✨</button>
+          </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="card p-8">
+            <h3 class="text-2xl font-bold mb-6">نقاط القوة</h3>
+            <div class="space-y-3">
+              <div class="flex justify-between">
+                <span>الرياضيات</span>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: 92%"></div>
+                </div>
+              </div>
+              <div class="flex justify-between">
+                <span>اللغة العربية</span>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: 78%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card p-8">
+            <h3 class="text-2xl font-bold mb-6">النمو الأسبوعي</h3>
+            <div class="space-y-2">
+              <div class="flex justify-between text-sm">
+                <span>الأسبوع الماضي</span>
+                <span>+245⭐</span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span>هذا الأسبوع</span>
+                <span>+387⭐</span>
+              </div>
+            </div>
+            <div class="progress-bar mt-6">
+              <div class="progress-fill" style="width: 75%"></div>
+            </div>
+          </div>
+
+          <div class="card p-8 md:col-span-3 lg:col-span-1">
+            <h3 class="text-2xl font-bold mb-6">إنجاز جديد! 🎉</h3>
+            <div class="text-center">
+              <div class="text-5xl mb-4">🏆</div>
+              <p class="text-lg opacity-80">أكملت 50 درس!</p>
+              <button class="btn-primary mt-6 px-8 py-3 w-full">شاهد المكافآت</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Games Section -->
+    <div id="games" class="hidden">
+      <header class="header">
+        <div class="logo">⭐ الألعاب التعليمية</div>
+        <button class="nav-btn" onclick="showDashboard()">🏠</button>
+      </header>
+      
+      <div class="max-w-6xl mx-auto p-8">
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div class="game-card card text-center p-8 hover:scale-105 transition-all">
+            <div class="text-5xl mb-6">🌈</div>
+            <h3 class="text-2xl font-bold mb-4">لعبة الألوان</h3>
+            <button class="btn-primary game-btn" onclick="playColorGame()">العب الآن</button>
+          </div>
+          
+          <div class="game-card card text-center p-8 hover:scale-105 transition-all">
+            <div class="text-5xl mb-6">🔢</div>
+            <h3 class="text-2xl font-bold mb-4">لعبة الأرقام</h3>
+            <button class="btn-primary game-btn" onclick="playMathGame()">العب الآن</button>
+          </div>
+          
+          <div class="game-card card text-center p-8 hover:scale-105 transition-all">
+            <div class="text-5xl mb-6">🧠</div>
+            <h3 class="text-2xl font-bold mb-4">الذاكرة</h3>
+            <button class="btn-primary game-btn" onclick="playMemoryGame()">العب الآن</button>
+          </div>
+          
+          <div class="game-card card text-center p-8 hover:scale-105 transition-all">
+            <div class="text-5xl mb-6">🧩</div>
+            <h3 class="text-2xl font-bold mb-4">الألغاز</h3>
+            <button class="btn-primary game-btn" onclick="playPuzzleGame()">العب الآن</button>
+          </div>
+        </div>
+        
+        <div class="card mt-12">
+          <h2 class="text-3xl font-bold mb-8 text-center">ألعابك المفضلة ⭐</h2>
+          <div class="flex flex-wrap gap-4 justify-center">
+            <button class="btn-primary px-6 py-3 text-lg">الألوان (92%)</button>
+            <button class="btn-primary px-6 py-3 text-lg">الأرقام (78%)</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress Section -->
+    <div id="progress" class="hidden">
+      <header class="header">
+        <div class="logo">📊 التقدم</div>
+        <button class="nav-btn" onclick="showDashboard()">🏠</button>
+      </header>
+      
+      <div class="max-w-5xl mx-auto p-8">
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div class="card lg:col-span-2">
+            <h2 class="text-3xl font-bold mb-8">شجرة المهارات 🌳</h2>
+            <div class="grid md:grid-cols-3 gap-6">
+              <div>
+                <h3 class="font-bold text-xl mb-4">الأساسيات</h3>
+                <div class="space-y-2">
+                  <div class="flex justify-between">
+                    <span>الألوان</span>
+                    <div class="w-24 bg-gray-200 rounded-full h-3">
+                      <div class="bg-green-500 h-3 rounded-full" style="width: 100%"></div>
+                    </div>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>الأرقام</span>
+                    <div class="w-24 bg-gray-200 rounded-full h-3">
+                      <div class="bg-yellow-500 h-3 rounded-full" style="width: 85%"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <h3 class="font-bold text-xl mb-4">متوسط</h3>
+                <div class="space-y-2">
+                  <div class="flex justify-between">
+                    <span>الذاكرة</span>
+                    <div class="w-24 bg-gray-200 rounded-full h-3">
+                      <div class="bg-blue-500 h-3 rounded-full" style="width: 65%"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <h3 class="font-bold text-xl mb-4">متقدم</h3>
+                <div class="space-y-2">
+                  <div class="flex justify-between">
+                    <span>المنطق</span>
+                    <div class="w-24 bg-gray-200 rounded-full h-3">
+                      <div class="bg-purple-500 h-3 rounded-full" style="width: 45%"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card">
+            <h3 class="text-2xl font-bold mb-6">الإنجازات</h3>
+            <div class="space-y-3">
+              <div class="flex items-center gap-4 p-4 bg-yellow-100 rounded-xl">
+                <div class="text-2xl">⭐</div>
+                <span>50 درس مكتمل</span>
+              </div>
+              <div class="flex items-center gap-4 p-4 bg-green-100 rounded-xl">
+                <div class="text-2xl">🔥</div>
+                <span>7 أيام متتالية</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+

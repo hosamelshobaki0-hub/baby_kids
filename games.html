@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عالم الألعاب السحري | Kids Learning</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css"> 
+    <style>
+        /* إضافة لمسات خاصة بصفحة الألعاب فقط */
+        body { 
+            background: #a29bfe;
+            background-image: radial-gradient(#ffffff 2px, transparent 2px);
+            background-size: 30px 30px;
+            font-family: 'Cairo', sans-serif; /* Ensure Cairo font is applied */
+        }
+        /* Common button style for consistency */
+        .btn-game-action {
+            transition: all 0.2s;
+            border-bottom: 6px solid rgba(0,0,0,0.2);
+        }
+
+        .games-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 30px; 
+            padding: 20px;
+        }
+
+        .game-card {
+            transition: var(--transition-smooth);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            background: white; 
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
+            cursor: pointer; /* Make all cards clickable by default */
+        }
+
+        .game-card.locked {
+            filter: grayscale(1) blur(1px);
+            cursor: not-allowed;
+            position: relative;
+        }
+
+        .lock-tag {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: #ff7675;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            z-index: 10;
+        }
+
+        .age-tag {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #74b9ff;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        .game-card:hover .game-icon {
+            transform: scale(1.1) rotate(5deg);
+            transition: transform 0.3s ease;
+        }
+
+        .game-icon {
+            font-size: 4.5rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .card-footer {
+            margin-top: auto;
+            padding-top: 20px;
+        }
+        .game-card h3 {
+            font-size: 1.5rem;
+            font-weight: 900;
+        }
+    </style>
+</head>
+<body class="age-kid">
+
+    <nav class="smart-header">
+        <button class="btn-universal btn-primary" onclick="goHome()">🏠 الرئيسية</button>
+        <div class="logo">🎮 مدينة الألعاب</div>
+        <div class="star-badge" style="background: #fdcb6e; color: #d35400; padding: 10px 20px; border-radius: 50px; font-weight: bold;">
+            ⭐ <span id="star-count">0</span>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 style="text-align: center; color: white; margin: 40px 0; font-size: 2.5rem; text-shadow: 3px 3px 0px rgba(0,0,0,0.1);">جاهز للمغامرة يا بطل؟ ✨</h1>
+        
+        <div class="games-grid">
+            
+        </div>
+    </div>
+
+    <script>
+        const gamesData = [
+            {
+                id: 'bunny-friend',
+                title: 'أرنوب الذكي',
+                icon: '🐰',
+                description: 'تحدث مع أرنوب، أطعمه الجزر، واسمع منه أجمل النصائح والقصص!',
+                link: 'bunny-friend.html',
+                minStarsToUnlock: 0,
+                ageTag: 'صديقك المفضل ✨',
+                buttonText: 'زيارة أرنوب 💬',
+                buttonColor: '#6c5ce7'
+            },
+            {
+                id: 'animal-sounds',
+                title: 'أين صوتي؟',
+                icon: '🐶',
+                description: 'اسمع صوت الحيوان الجميل واضغط على صورته!',
+                link: 'animal-sounds.html',
+                minStarsToUnlock: 0,
+                ageTag: 'عمر 2 سنة 👶',
+                buttonText: 'هيا نلعب 🐾',
+                buttonColor: '#ff7675'
+            },
+            {
+                id: 'bubble-pop',
+                title: 'فرقعة الفقاعات',
+                icon: '🫧',
+                description: 'لمسة واحدة لفرقعة الفقاعة واكتشاف المفاجأة!',
+                link: 'bubble-pop.html',
+                minStarsToUnlock: 0,
+                ageTag: 'عمر 2 سنة 👶',
+                buttonText: 'فرقع الآن ✨',
+                buttonColor: '#74b9ff'
+            },
+            {
+                id: 'color-game',
+                title: 'مغامرة الألوان',
+                icon: '🎨',
+                description: 'تعلم الألوان المرحة مع الفواكه اللذيذة!',
+                link: 'color-game.html',
+                minStarsToUnlock: 0,
+                ageTag: '',
+                buttonText: 'العب الآن 🚀',
+                buttonColor: '#4ade80'
+            },
+            {
+                id: 'balloon-pop',
+                title: 'فرقعة الحروف',
+                icon: '🎈',
+                description: 'صِد الحرف المطلوب وسط البالونات الطائرة!',
+                link: 'balloon-pop.html',
+                minStarsToUnlock: 0,
+                ageTag: '',
+                buttonText: 'ابدأ الصيد 🏹',
+                buttonColor: '#fd79a8'
+            },
+            {
+                id: 'reading-game', // Assuming this file exists
+                title: 'بطل القراءة',
+                icon: '📖',
+                description: 'اقرأ الكلمة واختر الصورة الصحيحة لتفوز!',
+                link: 'reading-game.html',
+                minStarsToUnlock: 0,
+                ageTag: '',
+                buttonText: 'ابدأ القراءة 📚',
+                buttonColor: '#00b894'
+            },
+            {
+                id: 'food-game', // Assuming this file exists and is the word-image-match
+                title: 'الكلمة والصورة',
+                icon: '🍎',
+                description: 'صل الكلمة بالصورة الصحيحة للفواكه والخضروات!',
+                link: 'food-game.html',
+                minStarsToUnlock: 0,
+                ageTag: '',
+                buttonText: 'العب الآن 🥕',
+                buttonColor: '#55efc4',
+                buttonTextColor: '#2d3436'
+            },
+            {
+                id: 'numbers-game-ar',
+                title: 'الأرقام العربية',
+                icon: '🔢',
+                description: 'اسمع الرقم واختار الشكل الصحيح!',
+                link: 'numbers-game-ar.html',
+                minStarsToUnlock: 0,
+                ageTag: '',
+                buttonText: 'العب الآن 🌟',
+                buttonColor: '#fdcb6e',
+                buttonTextColor: '#d35400'
+            },
+            {
+                id: 'fishing-game',
+                title: 'صيد الأرقام',
+                icon: '🎣',
+                description: 'استخدم صنارتك السحرية لصيد الأرقام من البحر!',
+                link: 'Glassmorphism.html', // Corrected link based on context
+                minStarsToUnlock: 15,
+                ageTag: '',
+                buttonText: 'مغلق',
+                buttonColor: '#b2bec3'
+            },
+            {
+                id: 'memory-game',
+                title: 'تحدي الذاكرة',
+                icon: '🧠',
+                description: 'اختبر ذكاءك وجد الصور المتشابهة في أسرع وقت!',
+                link: 'memory-game.html',
+                minStarsToUnlock: 5,
+                ageTag: '',
+                buttonText: 'العب الآن 🧠',
+                buttonColor: '#6c5ce7'
+            },
+            {
+                id: 'shadow-match',
+                title: 'الظل السحري',
+                icon: '👤',
+                description: 'هل تستطيع معرفة صاحب هذا الظل؟ ركز جيداً!',
+                link: 'shadow-match.html',
+                minStarsToUnlock: 10,
+                ageTag: '',
+                buttonText: 'ابدأ التحدي 👤',
+                buttonColor: '#fd79a8'
+            },
+            {
+                id: 'numbers-train',
+                title: 'قطار الأرقام',
+                icon: '🚂',
+                description: 'اركب قطار الأرقام السعيد وتعلم العد معنا!',
+                link: 'numbers-train.html',
+                minStarsToUnlock: 0,
+                ageTag: '',
+                buttonText: 'اركب القطار 🚂',
+                buttonColor: '#fab1a0'
+            },
+            {
+                id: 'number-order',
+                title: 'ترتيب الأرقام',
+                icon: '🛤️',
+                description: 'ساعد في ترتيب عربات القطار من الأصغر إلى الأكبر!',
+                link: 'number-order.html',
+                minStarsToUnlock: 15,
+                ageTag: '',
+                buttonText: 'رتب الآن ✅',
+                buttonColor: '#55efc4',
+                buttonTextColor: '#2d3436'
+            },
+            {
+                id: 'piano', // Assuming this file exists
+                title: 'بيانو النجوم',
+                icon: '🎹',
+                description: 'اصنع ألحانك الخاصة وتعلم أسماء الألوان بالصوت!',
+                link: 'piano-game.html',
+                minStarsToUnlock: 0,
+                ageTag: '',
+                buttonText: 'عزف الموسيقى 🎵',
+                buttonColor: '#fdcb6e',
+                buttonTextColor: '#d35400'
+            },
+            {
+                id: 'shapes-game', // Assuming this file exists
+                title: 'تحدي الأشكال',
+                icon: '🔺',
+                description: 'هل يمكنك مطابقة الأشكال الهندسية السحرية؟',
+                link: 'shapes-game.html',
+                minStarsToUnlock: 30,
+                ageTag: '',
+                buttonText: 'مغلق',
+                buttonColor: '#b2bec3'
+            },
+            {
+                id: 'math-game',
+                title: 'عبقري الأرقام',
+                icon: '🔢',
+                description: 'تحديات حسابية ممتعة للأذكياء فقط!',
+                link: 'math-game.html',
+                minStarsToUnlock: 50,
+                ageTag: '',
+                buttonText: 'مغلق',
+                buttonColor: '#b2bec3'
+            }
+        ];
+
+        const gamesGrid = document.querySelector('.games-grid');
+        let userStars = 0;
+
+        function speak(text) {
+            window.speechSynthesis.cancel();
+            const msg = new SpeechSynthesisUtterance(text);
+            msg.lang = 'ar-SA';
+            msg.rate = 0.9;
+            window.speechSynthesis.speak(msg);
+        }
+
+        function renderGames() {
+            const progress = JSON.parse(localStorage.getItem('gameProgress') || '{"stars": 0}');
+            userStars = progress.stars;
+            document.getElementById('star-count').innerText = userStars;
+            gamesGrid.innerHTML = ''; // Clear existing cards
+
+            gamesData.forEach(game => {
+                const isLocked = userStars < game.minStarsToUnlock;
+                const card = document.createElement('div');
+                card.className = `card game-card ${isLocked ? 'locked' : ''}`;
+                card.id = game.id;
+
+                let ageTagHtml = '';
+                if (game.ageTag) {
+                    ageTagHtml = `<div class="age-tag" style="background: ${game.buttonColor};">${game.ageTag}</div>`;
+                }
+
+                let lockTagHtml = '';
+                let buttonHtml = '';
+                let cardOnClick = '';
+
+                if (isLocked) {
+                    lockTagHtml = `<div class="lock-tag">🔒 ${game.minStarsToUnlock} نجمة</div>`;
+                    buttonHtml = `<button class="btn-universal btn-game-action" disabled style="width: 100%; background: ${game.buttonColor}; color: white;">مغلق</button>`;
+                    cardOnClick = `speak('تحتاج إلى ${game.minStarsToUnlock} نجمة لفتح لعبة ${game.title}')`;
+                } else {
+                    buttonHtml = `<button class="btn-universal btn-game-action btn-primary" style="width: 100%; background: ${game.buttonColor}; color: ${game.buttonTextColor || 'white'};">${game.buttonText || 'هيا نلعب!'}</button>`;
+                    cardOnClick = `location.href='${game.link}'`;
+                }
+
+                card.innerHTML = `
+                    ${ageTagHtml}
+                    ${lockTagHtml}
+                    <span class="game-icon">${game.icon}</span>
+                    <h3>${game.title}</h3>
+                    <p>${game.description}</p>
+                    <div class="card-footer">
+                        ${buttonHtml}
+                    </div>
+                `;
+                card.setAttribute('onclick', cardOnClick);
+                card.onmouseenter = () => speak(game.title);
+                
+                gamesGrid.appendChild(card);
+            });
+        }
+
+        function goHome() {
+            location.href = 'child-dashboard.html';
+        }
+
+        window.onload = renderGames;
+    </script>
+</body>
+</html>

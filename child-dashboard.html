@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة الأبطال | Kids Academy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        :root {
+            --p-grad: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            --s-grad: linear-gradient(135deg, #fdcb6e, #ffeaa7);
+            --treasure-grad: linear-gradient(135deg, #0984e3, #00cec9);
+            --bg: #f0f7ff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body { 
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(108, 92, 231, 0.15) 0, transparent 50%), 
+                radial-gradient(at 50% 0%, rgba(255, 118, 117, 0.1) 0, transparent 50%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* رأس الصفحة */
+        .top-nav {
+            background: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            position: sticky; top: 0; z-index: 1000;
+        }
+
+        .user-stats {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: #f8f9fa;
+            padding: 8px 20px;
+            border-radius: 50px;
+            border: 2px solid #eee;
+        }
+
+        .stat-item { font-size: 1.2rem; font-weight: 900; color: #2d3436; }
+
+        /* منطقة الترحيب */
+        .welcome-section {
+            text-align: center;
+            padding: 50px 20px;
+            background: var(--p-grad);
+            color: white;
+            border-bottom-left-radius: 60px;
+            border-bottom-right-radius: 60px;
+            box-shadow: 0 15px 30px rgba(108, 92, 231, 0.2);
+        }
+
+        .avatar-container {
+            position: relative;
+            width: 150px; height: 150px;
+            margin: 0 auto 20px;
+        }
+
+        .main-avatar {
+            width: 100%; height: 100%;
+            background: white;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 70px;
+            border: 6px solid rgba(255,255,255,0.5);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .badge-icon {
+            position: absolute; bottom: 5px; right: 5px;
+            background: #fdcb6e; width: 45px; height: 45px;
+            border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; font-size: 20px; border: 3px solid white;
+        }
+
+        /* شبكة الأزرار */
+        .main-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            max-width: 1200px;
+            margin: -40px auto 40px;
+            padding: 0 20px;
+        }
+
+        .action-card {
+            background: white;
+            border-radius: 35px;
+            padding: 30px;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-card:hover {
+            transform: translateY(-15px) scale(1.03);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.1);
+        }
+
+        /* كارت الخريطة الخاص */
+        .treasure-card {
+            background: var(--treasure-grad);
+            border: none;
+        }
+        .treasure-card .card-title, .treasure-card .card-desc { color: white; }
+        .treasure-card::before {
+            content: 'جديد ✨';
+            position: absolute; top: 15px; left: -20px;
+            background: #ff7675; color: white;
+            padding: 5px 30px; transform: rotate(-45deg);
+            font-size: 0.8rem; font-weight: bold;
+        }
+
+        .card-icon {
+            font-size: 4.5rem;
+            margin-bottom: 20px;
+            display: block;
+            transition: 0.3s;
+        }
+
+        .action-card:hover .card-icon { transform: rotate(10deg) scale(1.1); }
+
+        .card-title { font-size: 1.8rem; color: #2d3436; margin-bottom: 10px; }
+        .card-desc { color: #636e72; font-size: 1rem; line-height: 1.5; }
+
+        /* شريط المستوى */
+        .level-container {
+            max-width: 500px; margin: 20px auto 0;
+            background: rgba(255,255,255,0.2);
+            height: 12px; border-radius: 10px; overflow: hidden;
+        }
+        .level-fill {
+            height: 100%; background: #55efc4; width: 0%;
+            box-shadow: 0 0 15px rgba(85, 239, 196, 0.5);
+            transition: width 1s ease;
+        }
+
+        @media (max-width: 600px) {
+            .welcome-section { padding: 30px 15px; }
+            .main-grid { margin-top: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="top-nav">
+        <div class="logo" style="font-weight: 900; color: #6c5ce7; font-size: 1.5rem;">🌟 لوحة الأبطال</div>
+        <div class="user-stats">
+            <span class="stat-item" id="stars-count">⭐ 0</span>
+            <div style="width: 2px; height: 20px; background: #ddd;"></div>
+            <span class="stat-item" id="level-text">مستوى 1</span>
+        </div>
+    </nav>
+
+    <section class="welcome-section">
+        <div class="avatar-container">
+            <div class="main-avatar" id="avatar-emoji">👶</div>
+            <div class="badge-icon">🏆</div>
+        </div>
+        <h1 id="greeting" style="font-size: 2.5rem; margin-bottom: 10px;">أهلاً بك يا بطل!</h1>
+        <p id="sub-info" style="font-size: 1.2rem; opacity: 0.9;">أنت مستعد لمغامرة جديدة؟</p>
+        
+        <div class="level-container">
+            <div class="level-fill" id="level-bar"></div>
+        </div>
+    </section>
+
+    <main class="main-grid">
+        <div class="action-card treasure-card" onclick="location.href='roadmap.html'">
+            <span class="card-icon">🗺️</span>
+            <h3 class="card-title">خريطة الكنز</h3>
+            <p class="card-desc">اكتشف طريقك نحو الهدايا والألعاب المغلقة في رحلة أسطورية!</p>
+        </div>
+
+        <div class="action-card" onclick="location.href='learning-menu.html'">
+            <span class="card-icon">🚀</span>
+            <h3 class="card-title">ابدأ التعلم</h3>
+            <p class="card-desc">اكتشف دروس الألوان، الأرقام، والحيوانات في رحلة ممتعة!</p>
+        </div>
+
+        <div class="action-card" onclick="location.href='games.html'" style="border-bottom: 6px solid #ff7675;">
+            <span class="card-icon">🎮</span>
+            <h3 class="card-title">منطقة الألعاب</h3>
+            <p class="card-desc">العب وتحدى نفسك واجمع الكثير من النجوم الذهبية.</p>
+        </div>
+
+        <div class="action-card" onclick="location.href='stories.html'" style="border-bottom: 6px solid #ff7675;">
+            <span class="card-icon">📖</span>
+            <h3 class="card-title">وقت الحكايات</h3>
+            <p class="card-desc">استمتع بمشاهدة أجمل القصص والرسوم المتحركة الممتعة!</p>
+        </div>
+
+        <div class="action-card" onclick="location.href='progress.html'">
+            <span class="card-icon">🏅</span>
+            <h3 class="card-title">إنجازاتي</h3>
+            <p class="card-desc">شاهد كم نجمة جمعت والأوسمة التي حصلت عليها.</p>
+        </div>
+    </main>
+
+    <div style="text-align: center; margin-bottom: 40px;">
+        <button onclick="logout()" style="background:none; border:none; color:#b2bec3; cursor:pointer; font-weight:bold; font-family:'Cairo';">تسجيل الخروج 👋</button>
+    </div>
+
+    <script>
+        function loadDashboard() {
+            const user = JSON.parse(localStorage.getItem('kidsUser') || '{}');
+            const progress = JSON.parse(localStorage.getItem('gameProgress') || '{"stars": 0}');
+
+            if (!user.childName) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // تحديث النصوص
+            document.getElementById('greeting').innerText = `أهلاً ${user.childName}! 🎉`;
+            document.getElementById('stars-count').innerText = `⭐ ${progress.stars}`;
+            
+            // حساب المستوى
+            const level = Math.floor(progress.stars / 50) + 1;
+            document.getElementById('level-text').innerText = `مستوى ${level}`;
+            
+            // تحريك شريط المستوى
+            setTimeout(() => {
+                const progressInLevel = (progress.stars % 50) * 2; 
+                document.getElementById('level-bar').style.width = `${progressInLevel}%`;
+            }, 100);
+
+            // تغيير الإيموجي بناءً على العمر
+            if(user.childAge > 7) {
+                document.getElementById('avatar-emoji').innerText = '👦';
+            } else {
+                document.getElementById('avatar-emoji').innerText = '👶';
+            }
+        }
+
+        function logout() {
+            if(confirm('هل تريد الخروج يا بطل؟')) {
+                localStorage.removeItem('kidsUser');
+                window.location.href = 'login.html';
+            }
+        }
+
+        window.onload = loadDashboard;
+    </script>
+</body>
+</html>

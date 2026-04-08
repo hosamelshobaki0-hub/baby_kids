@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مكتبة الفيديوهات السحرية 🎬</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #f0f4f8;
+            --card-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            /* ألوان التصنيفات */
+            --family-color: #ff7675;
+            --numbers-color: #74b9ff;
+            --animals-color: #55efc4;
+            --prophets-color: #a29bfe;
+            --dance-color: #fdcb6e;
+            --sports-color: #00b894;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        .header-title {
+            text-align: center;
+            color: #2d3436;
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+        }
+
+        /* شبكة الكروت */
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        /* تصميم الكارت الاحترافي */
+        .video-card {
+            background: white;
+            border-radius: 25px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            position: relative;
+            border-bottom: 8px solid #dfe6e9;
+        }
+
+        .video-card:hover {
+            transform: translateY(-15px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .card-image {
+            height: 180px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 4rem;
+        }
+
+        .play-btn {
+            position: absolute;
+            background: rgba(255,255,255,0.9);
+            width: 60px; height: 60px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: #333; font-size: 1.5rem;
+            opacity: 0; transition: 0.3s;
+        }
+
+        .video-card:hover .play-btn { opacity: 1; }
+
+        .card-content { padding: 20px; text-align: center; }
+        .card-content h3 { margin: 0; font-size: 1.4rem; color: #2d3436; }
+        .card-content p { color: #636e72; font-size: 0.9rem; margin-top: 8px; }
+
+        /* تخصيص ألوان الكروت */
+        .family { background: var(--family-color); border-bottom-color: #d63031; }
+        .numbers { background: var(--numbers-color); border-bottom-color: #0984e3; }
+        .animals { background: var(--animals-color); border-bottom-color: #00b894; }
+        .prophets { background: var(--prophets-color); border-bottom-color: #6c5ce7; }
+        .dance { background: var(--dance-color); border-bottom-color: #e17055; }
+        .sports { background: var(--sports-color); border-bottom-color: #009432; }
+
+        /* مشغل الفيديو (Modal) */
+        .video-overlay {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.9);
+            display:none; align-items:center; justify-content:center;
+            z-index: 1000;
+        }
+        .video-container { width: 90%; max-width: 800px; position: relative; }
+        .close-video {
+            position: absolute; top: -50px; left: 0;
+            color: white; font-size: 2rem; cursor: pointer;
+        }
+        iframe { width: 100%; height: 450px; border-radius: 20px; border: 5px solid white; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 class="header-title">مكتبة الفيديو الذكية للأبطال 🌟</h1>
+    
+    <div class="video-grid">
+        <div class="video-card" onclick="playVideo('joYhooXob10')">
+            <div class="card-image family">
+                <i class="fas fa-users"></i>
+                <div class="play-btn"><i class="fas fa-play"></i></div>
+            </div>
+            <div class="card-content">
+                <h3>فيديوهات العائلة</h3>
+                <p>أغاني وقصص ممتعة لكل أفراد العائلة</p>
+            </div>
+        </div>
+
+        <div class="video-card" onclick="playVideo('gr3XKopIsVA')">
+            <div class="card-image numbers">
+                <i class="fas fa-sort-numeric-up"></i>
+                <div class="play-btn"><i class="fas fa-play"></i></div>
+            </div>
+            <div class="card-content">
+                <h3>عالم الأرقام</h3>
+                <p>نتعلم العد والرياضيات بطريقة سحرية</p>
+            </div>
+        </div>
+
+        <div class="video-card" onclick="playVideo('Qs9V7M499bY')">
+            <div class="card-image animals">
+                <i class="fas fa-paw"></i>
+                <div class="play-btn"><i class="fas fa-play"></i></div>
+            </div>
+            <div class="card-content">
+                <h3>مملكة الحيوان</h3>
+                <p>تعرف على أصدقائنا في الغابة والمزرعة</p>
+            </div>
+        </div>
+
+        <div class="video-card" onclick="playVideo('iA3P4n3K7fI')">
+            <div class="card-image prophets">
+                <i class="fas fa-book-open"></i>
+                <div class="play-btn"><i class="fas fa-play"></i></div>
+            </div>
+            <div class="card-content">
+                <h3>قصص الأنبياء</h3>
+                <p>مغامرات وعبر من أجمل القصص الدينية</p>
+            </div>
+        </div>
+
+        <div class="video-card" onclick="playVideo('qyPbYRS6jag')">
+            <div class="card-image dance">
+                <i class="fas fa-music"></i>
+                <div class="play-btn"><i class="fas fa-play"></i></div>
+            </div>
+            <div class="card-content">
+                <h3>ارقص وتحرك</h3>
+                <p>هيا نهز أجسادنا مع أجمل الإيقاعات</p>
+            </div>
+        </div>
+
+        <div class="video-card" onclick="playVideo('IDP3sV9ZMEc')">
+            <div class="card-image sports">
+                <i class="fas fa-running"></i>
+                <div class="play-btn"><i class="fas fa-play"></i></div>
+            </div>
+            <div class="card-content">
+                <h3>تمارين الأبطال</h3>
+                <p>قوي جسمك وعقلك مع تمارين يومية</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="videoOverlay" class="video-overlay" onclick="closeVideo()">
+    <div class="video-container" onclick="event.stopPropagation()">
+        <span class="close-video">&times; إغلاق</span>
+        <iframe id="youtubePlayer" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    </div>
+</div>
+
+<script>
+    function playVideo(videoId) {
+        const overlay = document.getElementById('videoOverlay');
+        const player = document.getElementById('youtubePlayer');
+        player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+        overlay.style.display = 'flex';
+        
+        // صوت ترحيبي
+        const msg = new SpeechSynthesisUtterance('مشاهدة ممتعة يا بطل!');
+        msg.lang = 'ar-SA';
+        window.speechSynthesis.speak(msg);
+    }
+
+    function closeVideo() {
+        const overlay = document.getElementById('videoOverlay');
+        const player = document.getElementById('youtubePlayer');
+        player.src = '';
+        overlay.style.display = 'none';
+    }
+</script>
+
+</body>
+</html>

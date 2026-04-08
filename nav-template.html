@@ -1,0 +1,245 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<nav class="smart-header">
+    <div class="nav-top">
+        <div class="user-profile" onclick="location.href='profile.html'">
+            <div class="avatar-container">
+                <img id="user-avatar" src="https://cdn-icons-png.flaticon.com/512/3048/3048122.png" alt="Avatar">
+                <div class="level-badge" id="user-level">1</div>
+            </div>
+            <div class="user-info">
+                <span class="welcome-text">أهلاً يا بطل!</span>
+                <span class="user-name" id="display-name">صديقي المكتشف</span>
+            </div>
+        </div>
+
+        <div class="stats-container">
+            <div class="stat-item stars-box" id="stars-display">
+                <i class="fas fa-star star-icon"></i>
+                <span id="star-count">0</span>
+            </div>
+            <div class="stat-item gems-box">
+                <i class="fas fa-gem gem-icon"></i>
+                <span id="gem-count">0</span>
+            </div>
+        </div>
+
+        <div class="nav-links">
+            <a href="child-dashboard.html" class="nav-link-item" data-name="الرئيسية">
+                <i class="fas fa-home"></i>
+                <span>الرئيسية</span>
+            </a>
+            <a href="games.html" class="nav-link-item" data-name="الألعاب">
+                <i class="fas fa-gamepad"></i>
+                <span>الألعاب</span>
+                <span class="notification-dot"></span>
+            </a>
+            <a href="achievements.html" class="nav-link-item" data-name="الأوسمة">
+                <i class="fas fa-trophy"></i>
+                <span>أوسمتي</span>
+            </a>
+            <div class="parent-gate">
+                <a href="parent-dashboard.html" class="parent-link">
+                    <i class="fas fa-user-shield"></i>
+                    <span>بوابة الأهل</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="xp-progress-container">
+        <div class="xp-bar-fill" id="xp-fill" style="width: 45%"></div>
+    </div>
+</nav>
+
+<style>
+:root {
+    --nav-bg: #ffffff;
+    --primary-color: #6c5ce7;
+    --star-color: #fdcb6e;
+    --xp-color: #00b894;
+}
+
+.smart-header {
+    background: var(--nav-bg);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    position: sticky;
+    top: 0;
+    z-index: 9999;
+    font-family: 'Cairo', sans-serif;
+}
+
+.nav-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 30px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* تصميم الأفاتار */
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    background: #f8f9fa;
+    padding: 5px 15px;
+    border-radius: 50px;
+    transition: 0.3s;
+}
+
+.avatar-container {
+    position: relative;
+    width: 50px;
+    height: 50px;
+}
+
+#user-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 3px solid var(--primary-color);
+}
+
+.level-badge {
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    background: var(--primary-color);
+    color: white;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+}
+
+/* عداد النجوم */
+.stats-container {
+    display: flex;
+    gap: 15px;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-weight: 900;
+    font-size: 1.2rem;
+    box-shadow: inset 0 -3px 0 rgba(0,0,0,0.1);
+}
+
+.stars-box { background: #fff9db; color: #f39c12; }
+.gems-box { background: #e3f2fd; color: #1e88e5; }
+
+.star-icon { animation: starPulse 2s infinite; }
+
+@keyframes starPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2) rotate(10deg); }
+    100% { transform: scale(1); }
+}
+
+/* روابط التنقل */
+.nav-links {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.nav-link-item {
+    text-decoration: none;
+    color: #636e72;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.9rem;
+    font-weight: 700;
+    transition: 0.3s;
+    position: relative;
+}
+
+.nav-link-item i { font-size: 1.5rem; margin-bottom: 4px; }
+
+.nav-link-item:hover { color: var(--primary-color); transform: translateY(-3px); }
+
+.notification-dot {
+    position: absolute;
+    top: 0;
+    right: 5px;
+    width: 10px;
+    height: 10px;
+    background: #ff7675;
+    border-radius: 50%;
+    border: 2px solid white;
+}
+
+/* بوابة الأهل */
+.parent-gate {
+    border-right: 2px solid #eee;
+    padding-right: 20px;
+    margin-right: 10px;
+}
+
+.parent-link {
+    text-decoration: none;
+    color: #b2bec3;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* شريط الخبرة السفلي */
+.xp-progress-container {
+    height: 6px;
+    background: #eee;
+    width: 100%;
+}
+
+.xp-bar-fill {
+    height: 100%;
+    background: var(--xp-color);
+    box-shadow: 0 0 10px rgba(0,184,148,0.5);
+    transition: width 1s ease-in-out;
+}
+</style>
+
+<script>
+    function updateSmartNav() {
+        const progress = JSON.parse(localStorage.getItem('gameProgress') || '{"stars": 0, "level": 1, "xp": 45}');
+        
+        // تحديث النصوص
+        document.getElementById('star-count').innerText = progress.stars;
+        document.getElementById('user-level').innerText = progress.level;
+        document.getElementById('xp-fill').style.width = progress.xp + '%';
+
+        // إضافة ميزة نطق الكلمات عند التمرير (Hover)
+        const navItems = document.querySelectorAll('.nav-link-item');
+        navItems.forEach(item => {
+            item.onmouseenter = () => {
+                const name = item.getAttribute('data-name');
+                const msg = new SpeechSynthesisUtterance(name);
+                msg.lang = 'ar-SA';
+                msg.rate = 1.2;
+                window.speechSynthesis.speak(msg);
+            };
+        });
+    }
+
+    // تأثير بصري عند زيادة النجوم
+    function animateStars() {
+        const box = document.getElementById('stars-display');
+        box.style.transform = 'scale(1.3)';
+        setTimeout(() => box.style.transform = 'scale(1)', 300);
+    }
+
+    window.onload = updateSmartNav;
+</script>

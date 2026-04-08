@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مغامرة الأشكال السحرية | 🟡🔺🔵</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  <style>
+    :root {
+      --primary: #6c5ce7;
+      --secondary: #a29bfe;
+      --success: #00b894;
+      --bg: #f0f2f5;
+    }
+
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: var(--bg);
+      background-image: radial-gradient(var(--secondary) 0.5px, transparent 0.5px);
+      background-size: 20px 20px;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      background: white;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .nav-btn {
+      text-decoration: none;
+      background: #ff7675;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 15px;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .star-counter {
+      background: #fdcb6e;
+      padding: 8px 20px;
+      border-radius: 50px;
+      color: #d35400;
+      font-weight: 900;
+    }
+
+    .game-container {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .card {
+      background: white;
+      border-radius: 40px;
+      padding: 40px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+      border-bottom: 10px solid #dfe6e9;
+    }
+
+    #question {
+      font-size: 2.5rem;
+      margin-bottom: 30px;
+      color: #2d3436;
+    }
+
+    .target-shape {
+      font-size: 5rem;
+      display: inline-block;
+      animation: bounce 2s infinite;
+    }
+
+    .target-shape.correct-anim {
+      animation: success-rotate 0.8s ease-out;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .shape-btn {
+      aspect-ratio: 1/1;
+      border: none;
+      border-radius: 30px;
+      font-size: 3.5rem;
+      cursor: pointer;
+      background: white;
+      border: 4px solid #f0f2f5;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .shape-btn:hover {
+      transform: translateY(-10px) scale(1.05);
+      border-color: var(--primary);
+      box-shadow: 0 15px 30px rgba(108, 92, 231, 0.2);
+    }
+
+    .shape-btn:active { transform: scale(0.9); }
+
+    .score-badge {
+      font-size: 1.8rem;
+      color: var(--primary);
+      font-weight: 900;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+
+    @keyframes success-rotate {
+      0% { transform: scale(1) rotate(0); }
+      50% { transform: scale(1.5) rotate(180deg); }
+      100% { transform: scale(1) rotate(360deg); }
+    }
+
+    /* تحسين للموبايل */
+    @media (max-width: 480px) {
+      #question { font-size: 1.8rem; }
+      .grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="header">
+    <a href="games.html" class="nav-btn">🔙 العودة</a>
+    <div class="star-counter">⭐ <span id="stars">0</span></div>
+  </nav>
+
+  <div class="game-container">
+    <div class="card">
+      <h1 style="color: var(--primary); margin-bottom: 10px;">لعبة الأشكال السحرية</h1>
+      <div id="question">
+        أين هو شكل الـ <span id="shape-name" style="color: #e84393;">...</span> ؟
+        <br>
+        <div class="target-shape" id="target-emoji">❓</div>
+      </div>
+
+      <div id="shapes" class="grid"></div>
+
+      <div class="score-badge">النقاط: <span id="score-val">0</span></div>
+    </div>
+  </div>
+
+  <script>
+    const shapesData = [
+      { name: 'دائرة', emoji: '🔴', color: '#ff7675' },
+      { name: 'مربع', emoji: '🟥', color: '#74b9ff' },
+      { name: 'مثلث', emoji: '🔺', color: '#55efc4' },
+      { name: 'نجمة', emoji: '⭐', color: '#fdcb6e' },
+      { name: 'قلب', emoji: '❤️', color: '#ff7675' },
+      { name: 'مستطيل', emoji: '▭', color: '#a29bfe' }
+    ];
+
+    let score = 0;
+    let currentTarget;
+    let totalStars = JSON.parse(localStorage.getItem('gameProgress') || '{"stars": 0}').stars;
+
+    // تحديث النجوم من الذاكرة
+    document.getElementById('stars').innerText = totalStars;
+
+    function initGame() {
+      // اختيار شكل عشوائي للسؤال
+      currentTarget = shapesData[Math.floor(Math.random() * shapesData.length)];
+      
+      document.getElementById('shape-name').textContent = currentTarget.name;
+      document.getElementById('target-emoji').textContent = currentTarget.emoji;
+      
+      const container = document.getElementById('shapes');
+      container.innerHTML = '';
+
+      // خلط الأشكال لعرضها كخيارات (نأخذ 4 خيارات عشوائية أحدها الصحيح)
+      let options = [...shapesData].sort(() => 0.5 - Math.random()).slice(0, 4);
+      if (!options.find(o => o.name === currentTarget.name)) {
+        options[0] = currentTarget;
+      }
+      options.sort(() => 0.5 - Math.random());
+
+      options.forEach(shape => {
+        const btn = document.createElement('button');
+        btn.className = 'shape-btn';
+        btn.innerHTML = shape.emoji;
+        btn.onclick = () => checkAnswer(shape.name);
+        container.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selectedName) {
+      if (selectedName === currentTarget.name) {
+        score += 10;
+        totalStars += 2; // إضافة نجمتين للرصيد الكلي
+        updateStats();
+        celebrate();
+        
+        const targetEmoji = document.getElementById('target-emoji');
+        targetEmoji.classList.add('correct-anim');
+        
+        speak('يا سلام! إنت بطل الأشكال');
+        
+        setTimeout(() => {
+            targetEmoji.classList.remove('correct-anim');
+            initGame();
+        }, 1000);
+      } else {
+        speak('حاول مرة أخرى يا بطل');
+        // تأثير هز للاشعار بالخطأ
+        document.querySelector('.card').animate([
+          { transform: 'translateX(0)' },
+          { transform: 'translateX(-10px)' },
+          { transform: 'translateX(10px)' },
+          { transform: 'translateX(0)' }
+        ], { duration: 300 });
+      }
+    }
+
+    function updateStats() {
+      document.getElementById('score-val').textContent = score;
+      document.getElementById('stars').innerText = totalStars;
+      
+      // حفظ في LocalStorage
+      let progress = { stars: totalStars };
+      localStorage.setItem('gameProgress', JSON.stringify(progress));
+    }
+
+    function celebrate() {
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#6c5ce7', '#00b894', '#fdcb6e']
+      });
+    }
+
+    function speak(text) {
+      const msg = new SpeechSynthesisUtterance(text);
+      msg.lang = 'ar-SA';
+      msg.rate = 0.9;
+      window.speechSynthesis.speak(msg);
+    }
+
+    window.onload = initGame;
+  </script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Alphabet Adventure 🔤</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { 
+            font-family: 'Quicksand', sans-serif; 
+            background: #fdf2f8; /* خلفية وردية هادئة للمواد الأجنبية */
+            overflow-x: hidden;
+        }
+        
+        .letter-btn {
+            font-family: 'Fredoka One', cursive;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            border-bottom: 8px solid rgba(0,0,0,0.1);
+        }
+        
+        .letter-btn:hover { 
+            transform: scale(1.1) rotate(5deg);
+            z-index: 10;
+        }
+
+        .letter-btn:active { transform: scale(0.9); }
+
+        /* تأثير الحركة عند النطق */
+        .speaking {
+            animation: bounce 0.5s infinite alternate;
+            border-color: #ec4899 !important;
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-10px); }
+        }
+
+        .card-enter {
+            animation: zoomIn 0.5s ease-out forwards;
+        }
+
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.5); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <nav class="max-w-6xl mx-auto flex justify-between items-center mb-10 bg-white p-5 rounded-[30px] shadow-md">
+        <div class="flex items-center gap-4">
+            <a href="learning-menu.html" class="bg-pink-500 hover:bg-pink-600 text-white px-6 py-3 rounded-2xl font-black shadow-lg transition-all">
+                ⬅️ Back
+            </a>
+        </div>
+        <h1 class="hidden md:block text-2xl font-black text-pink-600">ABC Learning Fun!</h1>
+        <div class="bg-amber-100 px-6 py-2 rounded-2xl border-2 border-amber-300 flex items-center gap-2">
+            <span class="text-2xl">⭐</span>
+            <span id="star-count-ui" class="text-2xl font-black text-amber-700">0</span>
+        </div>
+    </nav>
+
+    <div id="display-area" class="max-w-xl mx-auto bg-white rounded-[50px] p-8 mb-12 shadow-xl border-4 border-dashed border-pink-200 text-center min-h-[200px] flex flex-col items-center justify-center">
+        <div id="big-letter" class="text-8xl font-black text-pink-500 mb-2">?</div>
+        <div id="word-hint" class="text-2xl font-bold text-slate-400 italic">Click a letter to start!</div>
+    </div>
+
+    <div class="max-w-6xl mx-auto grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-9 gap-4" id="letters-grid">
+        </div>
+
+    <script>
+        const letters = [
+            { l: 'A', w: 'Apple', i: '🍎', c: 'bg-red-100 text-red-500' },
+            { l: 'B', w: 'Ball', i: '⚽', c: 'bg-blue-100 text-blue-500' },
+            { l: 'C', w: 'Cat', i: '🐱', c: 'bg-orange-100 text-orange-500' },
+            { l: 'D', w: 'Dog', i: '🐶', c: 'bg-green-100 text-green-500' },
+            { l: 'E', w: 'Egg', i: '🥚', c: 'bg-yellow-100 text-yellow-600' },
+            { l: 'F', w: 'Fish', i: '🐟', c: 'bg-cyan-100 text-cyan-500' },
+            { l: 'G', w: 'Giraffe', i: '🦒', c: 'bg-amber-100 text-amber-600' },
+            { l: 'H', w: 'Horse', i: '🐎', c: 'bg-rose-100 text-rose-500' },
+            { l: 'I', w: 'Ice Cream', i: '🍦', c: 'bg-sky-100 text-sky-500' },
+            { l: 'J', w: 'Juice', i: '🧃', c: 'bg-orange-100 text-orange-400' },
+            { l: 'K', w: 'Kangaroo', i: '🦘', c: 'bg-yellow-100 text-yellow-700' },
+            { l: 'L', w: 'Lion', i: '🦁', c: 'bg-amber-200 text-amber-800' },
+            { l: 'M', w: 'Monkey', i: '🐒', c: 'bg-brown-100 text-yellow-900' },
+            { l: 'N', w: 'Nest', i: '🪺', c: 'bg-emerald-100 text-emerald-600' },
+            { l: 'O', w: 'Orange', i: '🍊', c: 'bg-orange-100 text-orange-600' },
+            { l: 'P', w: 'Panda', i: '🐼', c: 'bg-slate-100 text-slate-800' },
+            { l: 'Q', w: 'Queen', i: '👸', c: 'bg-purple-100 text-purple-600' },
+            { l: 'R', w: 'Rabbit', i: '🐰', c: 'bg-pink-100 text-pink-500' },
+            { l: 'S', w: 'Sun', i: '☀️', c: 'bg-yellow-100 text-yellow-500' },
+            { l: 'T', w: 'Tiger', i: '🐯', c: 'bg-orange-200 text-orange-700' },
+            { l: 'U', w: 'Umbrella', i: '☂️', c: 'bg-indigo-100 text-indigo-500' },
+            { l: 'V', w: 'Van', i: '🚐', c: 'bg-blue-100 text-blue-600' },
+            { l: 'W', w: 'Watermelon', i: '🍉', c: 'bg-green-100 text-green-600' },
+            { l: 'X', w: 'Xylophone', i: '🪗', c: 'bg-pink-100 text-pink-400' },
+            { l: 'Y', w: 'Yo-yo', i: '🪀', c: 'bg-red-100 text-red-400' },
+            { l: 'Z', w: 'Zebra', i: '🦓', c: 'bg-slate-200 text-slate-700' }
+        ];
+
+        const grid = document.getElementById('letters-grid');
+        const bigLetter = document.getElementById('big-letter');
+        const wordHint = document.getElementById('word-hint');
+        let counter = 0;
+
+        function updateStars() {
+            const data = JSON.parse(localStorage.getItem('gameProgress') || '{"stars":0}');
+            document.getElementById('star-count-ui').innerText = data.stars;
+        }
+
+        function speak(text) {
+            window.speechSynthesis.cancel();
+            const msg = new SpeechSynthesisUtterance(text);
+            msg.lang = 'en-US';
+            msg.rate = 0.8;
+            window.speechSynthesis.speak(msg);
+        }
+
+        letters.forEach((item, index) => {
+            const btn = document.createElement('div');
+            btn.className = `letter-btn ${item.c} p-5 rounded-3xl text-3xl flex flex-col items-center justify-center card-enter shadow-sm`;
+            btn.style.animationDelay = (index * 0.03) + "s";
+            btn.innerHTML = `<span>${item.l}</span><span class="text-sm opacity-50">${item.l.toLowerCase()}</span>`;
+            
+            btn.onclick = () => {
+                // Update display
+                bigLetter.innerText = `${item.l}${item.l.toLowerCase()}`;
+                wordHint.innerText = `${item.i} ${item.w}`;
+                bigLetter.className = `text-8xl font-black mb-2 transition-all scale-110 ${item.c.split(' ')[1]}`;
+                
+                // Audio
+                speak(`${item.l} ... is for ... ${item.w}`);
+                
+                // Progress
+                counter++;
+                if(counter % 5 === 0) rewardStar();
+            };
+            
+            grid.appendChild(btn);
+        });
+
+        function rewardStar() {
+            let data = JSON.parse(localStorage.getItem('gameProgress') || '{"stars":0}');
+            data.stars += 2;
+            localStorage.setItem('gameProgress', JSON.stringify(data));
+            updateStars();
+            speak("Good job! You earned stars!");
+        }
+
+        window.onload = () => {
+            updateStars();
+            setTimeout(() => speak("Welcome to the Alphabet adventure! Let's learn A B C"), 500);
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مين صاحب الصوت؟ 🐾</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: #ff7675;
+      background-image: radial-gradient(#fab1a0 2px, transparent 2px);
+      background-size: 30px 30px;
+      min-height: 100vh;
+    }
+    .game-card {
+      background: white;
+      border-radius: 40px;
+      box-shadow: 0 20px 0 #d63031;
+      transition: all 0.2s;
+    }
+    .animal-btn {
+      background: #f1f2f6;
+      border-radius: 30px;
+      border-bottom: 6px solid #dfe4ea;
+      transition: all 0.2s;
+    }
+    .animal-btn:hover { 
+      transform: translateY(-8px) scale(1.05); 
+      background: white;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    .animal-btn.correct { background: #55efc4; border-color: #00b894; color: white; }
+    .animal-btn.wrong { background: #ff7675; border-color: #d63031; color: white; }
+    
+    .speaker-btn {
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+  </style>
+</head>
+<body class="p-4">
+
+  <nav class="flex justify-between items-center max-w-4xl mx-auto mb-8 bg-white/20 p-4 rounded-3xl backdrop-blur-sm">
+    <div class="text-2xl font-black text-white">🐾 مين صاحب الصوت؟</div>
+    <div class="bg-yellow-400 px-4 py-2 rounded-2xl font-bold shadow-sm">⭐ <span id="star-display">0</span></div>
+  </nav>
+
+  <div class="max-w-2xl mx-auto">
+    <div class="game-card p-8 text-center">
+      <h1 class="text-3xl font-black text-slate-800 mb-8">اسمع الصوت وقولي ده مين؟ 🎧</h1>
+      
+      <div class="mb-10">
+        <button onclick="playAnimalSound()" class="speaker-btn bg-blue-500 hover:bg-blue-600 text-white w-32 h-32 rounded-full text-5xl shadow-lg border-b-8 border-blue-700">
+          🔊
+        </button>
+        <p class="mt-4 text-slate-500 font-bold">دوس على السماعة عشان تسمع</p>
+      </div>
+
+      <div id="options-grid" class="grid grid-cols-2 gap-4 mb-8">
+        </div>
+
+      <div id="feedback" class="hidden text-2xl font-bold p-6 rounded-3xl mb-6 animate-bounce"></div>
+      
+      <button onclick="nextLevel()" id="next-btn" class="hidden w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black py-4 rounded-2xl text-xl shadow-lg border-b-8 border-emerald-700">
+        يلا حيوان تاني ➡️
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const animals = [
+      { id: 1, name: 'الأسد', emoji: '🦁', sound: 'هوووررراااا أنا ملك الغابة', hint: 'بيزأر وبيهز الأرض' },
+      { id: 2, name: 'الكلب', emoji: '🐕', sound: 'هوهو هوهو هوهو', hint: 'بيقول هو هو' },
+      { id: 3, name: 'القطة', emoji: '🐱', sound: 'مياو مياو نياو', hint: 'بتقول مياو' },
+      { id: 4, name: 'البطة', emoji: '🦆', sound: 'واك واك واك واك', hint: 'بتمشي تتدلع' },
+      { id: 5, name: 'الخروف', emoji: '🐑', sound: 'ماء ماء ماء', hint: 'عنده صوف كتير' },
+      { id: 6, name: 'العصفورة', emoji: '🐦', sound: 'صوصو صوصو صوصو', hint: 'بتزقزق فوق الشجرة' }
+    ];
+
+    let currentAnimal;
+    let canGuess = true;
+
+    function speakEgyptian(text) {
+      const msg = new SpeechSynthesisUtterance();
+      msg.text = text;
+      msg.lang = 'ar-EG';
+      msg.rate = 0.9;
+      window.speechSynthesis.speak(msg);
+    }
+
+    function initGame() {
+      canGuess = true;
+      const progress = JSON.parse(localStorage.getItem('gameProgress') || '{"stars":0}');
+      document.getElementById('star-display').innerText = progress.stars;
+      
+      // نختار حيوان عشوائي
+      currentAnimal = animals[Math.floor(Math.random() * animals.length)];
+      
+      // نجهز الاختيارات (الحيوان الصح + واحد غلط)
+      let options = [currentAnimal];
+      while(options.length < 2) {
+        let random = animals[Math.floor(Math.random() * animals.length)];
+        if(random.id !== currentAnimal.id) options.push(random);
+      }
+      options.sort(() => Math.random() - 0.5);
+
+      const grid = document.getElementById('options-grid');
+      grid.innerHTML = '';
+      
+      options.forEach(animal => {
+        const btn = document.createElement('button');
+        btn.className = 'animal-btn p-6 flex flex-col items-center justify-center';
+        btn.innerHTML = `<span class="text-6xl mb-2">${animal.emoji}</span><span class="text-xl font-bold">${animal.name}</span>`;
+        btn.onclick = () => checkChoice(animal, btn);
+        btn.onmouseenter = () => speakEgyptian(animal.name);
+        grid.appendChild(btn);
+      });
+
+      document.getElementById('feedback').classList.add('hidden');
+      document.getElementById('next-btn').classList.add('hidden');
+    }
+
+    function playAnimalSound() {
+      speakEgyptian(currentAnimal.sound);
+    }
+
+    function checkChoice(choice, btn) {
+      if(!canGuess) return;
+      canGuess = false;
+
+      const feedback = document.getElementById('feedback');
+      feedback.classList.remove('hidden');
+
+      if(choice.id === currentAnimal.id) {
+        btn.classList.add('correct');
+        feedback.innerText = "أيوه كده يا بطل.. شاطر قوي! 🎉";
+        feedback.className = "text-emerald-600 bg-emerald-50 p-6 rounded-3xl mb-6 animate-bounce";
+        speakEgyptian("أيوه كده يا بطل.. إنت شاطر قوي!");
+        updateStars(5);
+      } else {
+        btn.classList.add('wrong');
+        feedback.innerText = `لأ.. ده صوت ${currentAnimal.name} يا سكرة!`;
+        feedback.className = "text-rose-600 bg-rose-50 p-6 rounded-3xl mb-6";
+        speakEgyptian(`لأ.. فكر تاني.. ده صوت ${currentAnimal.name} يا سكرة`);
+      }
+
+      document.getElementById('next-btn').classList.remove('hidden');
+    }
+
+    function updateStars(amount) {
+      const progress = JSON.parse(localStorage.getItem('gameProgress') || '{"stars":0}');
+      progress.stars += amount;
+      localStorage.setItem('gameProgress', JSON.stringify(progress));
+      document.getElementById('star-display').innerText = progress.stars;
+    }
+
+    function nextLevel() {
+      initGame();
+      speakEgyptian("يلا نشوف اللي بعده.. مستعد؟");
+    }
+
+    window.onload = () => {
+      initGame();
+      // رسالة ترحيب
+      setTimeout(() => speakEgyptian("أهلاً يا بطل.. اسمع الصوت وقولي ده مين؟"), 500);
+    };
+  </script>
+</body>
+</html>

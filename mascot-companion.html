@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>أرنوب الذكي v4 | الرفيق الخارق 🐰✨</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --bunny-primary: #6c5ce7;
+      --bunny-secondary: #a29bfe;
+    }
+
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: #f0f3ff;
+      min-height: 100vh;
+      transition: background 1s ease;
+    }
+
+    /* خلفية متغيرة حسب الحالة */
+    .bg-happy { background: linear-gradient(135deg, #fff9db 0%, #fab1a0 100%); }
+    .bg-thinking { background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%); }
+
+    /* حركات الأرنب */
+    .bunny-float { animation: float 3s infinite ease-in-out; }
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(2deg); }
+    }
+
+    .eat-anim { animation: munch 0.2s 5; }
+    @keyframes munch {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    /* فقاعة الكلام المطورة */
+    .speech-bubble {
+      position: absolute;
+      bottom: 120%;
+      right: -20px;
+      width: 260px;
+      background: white;
+      border-radius: 25px;
+      padding: 15px;
+      box-shadow: 0 15px 30px rgba(108, 92, 231, 0.2);
+      border: 3px solid var(--bunny-primary);
+      opacity: 0;
+      transform: translateY(20px) scale(0.8);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .bubble-active { opacity: 1; transform: translateY(0) scale(1); }
+
+    /* أزرار التحكم - تأثير النيون */
+    .action-btn {
+      transition: all 0.3s;
+      border-bottom: 5px solid rgba(0,0,0,0.1);
+    }
+    .action-btn:active { transform: translateY(4px); border-bottom-width: 1px; }
+  </style>
+</head>
+<body class="p-4 bg-thinking" id="main-body">
+
+  <nav class="max-w-4xl mx-auto flex justify-between items-center bg-white/80 backdrop-blur-md p-4 rounded-3xl shadow-xl mb-6 border border-white">
+    <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center text-white font-black italic">V4</div>
+        <span class="text-xl font-black text-purple-900">أرنوب المطور</span>
+    </div>
+    <div class="flex items-center gap-3">
+        <div class="bg-orange-100 text-orange-600 px-4 py-1 rounded-full font-bold border border-orange-200">🥕 <span id="carrot-count">5</span></div>
+        <div class="bg-yellow-100 text-yellow-600 px-4 py-1 rounded-full font-bold border border-yellow-200">⭐ <span id="stars-count">0</span></div>
+    </div>
+  </nav>
+
+  <main class="max-w-4xl mx-auto grid md:grid-cols-2 gap-8 items-center pt-10">
+    
+    <div class="relative flex flex-col items-center">
+      <div id="bunny-container" class="relative">
+        <div id="bubble" class="speech-bubble text-center font-bold text-purple-800">
+          أهلاً بك يا بطل! أنا جائع قليلاً..
+        </div>
+        
+        <div id="bunny-face" class="w-56 h-56 bg-white rounded-full shadow-2xl flex items-center justify-center text-[100px] bunny-float cursor-pointer relative border-8 border-purple-100" onclick="petBunny()">
+          🐰
+        </div>
+        
+        <div class="w-32 h-4 bg-black/10 rounded-full mt-8 blur-sm"></div>
+      </div>
+    </div>
+
+    <div class="bg-white/60 backdrop-blur p-8 rounded-[40px] shadow-2xl border border-white/50">
+      <h2 class="text-2xl font-black text-purple-900 mb-6 flex items-center gap-2">
+          ماذا سنفعل الآن؟ ✨
+      </h2>
+      
+      <div class="grid grid-cols-2 gap-4">
+        <button onclick="bunnyInteract('feed')" class="action-btn p-5 bg-orange-400 text-white rounded-3xl font-bold hover:bg-orange-500">
+            <div class="text-3xl mb-1">🥕</div> إطعام أرنوب
+        </button>
+        <button onclick="bunnyInteract('joke')" class="action-btn p-5 bg-blue-500 text-white rounded-3xl font-bold hover:bg-blue-600">
+            <div class="text-3xl mb-1">😂</div> اضحك معي
+        </button>
+        <button onclick="bunnyInteract('lesson')" class="action-btn p-5 bg-green-500 text-white rounded-3xl font-bold hover:bg-green-600">
+            <div class="text-3xl mb-1">🧠</div> معلومة ذكية
+        </button>
+        <button onclick="bunnyInteract('dance')" class="action-btn p-5 bg-pink-500 text-white rounded-3xl font-bold hover:bg-pink-600">
+            <div class="text-3xl mb-1">🎵</div> رقصة أرنوب
+        </button>
+      </div>
+      
+      <button onclick="window.location.href='roadmap.html'" class="w-full mt-6 py-4 bg-purple-900 text-white rounded-2xl font-black text-lg hover:bg-black transition-all">
+          انطلاق إلى خريطة الألعاب 🗺️
+      </button>
+    </div>
+  </main>
+
+  <script>
+    let carrots = 5;
+    const stats = JSON.parse(localStorage.getItem('gameProgress') || '{"stars":0}');
+    document.getElementById('stars-count').innerText = stats.stars;
+
+    const face = document.getElementById('bunny-face');
+    const bubble = document.getElementById('bubble');
+    const body = document.getElementById('main-body');
+
+    function updateCarrots(val) {
+        carrots += val;
+        document.getElementById('carrot-count').innerText = carrots;
+    }
+
+    function speak(text, emoji = '🐰') {
+        window.speechSynthesis.cancel();
+        const msg = new SpeechSynthesisUtterance(text);
+        msg.lang = 'ar-SA';
+        msg.pitch = 1.4;
+        
+        face.innerText = emoji;
+        bubble.innerText = text;
+        bubble.classList.add('bubble-active');
+        
+        window.speechSynthesis.speak(msg);
+        
+        msg.onend = () => {
+            setTimeout(() => {
+                bubble.classList.remove('bubble-active');
+                face.innerText = '🐰';
+            }, 3000);
+        };
+    }
+
+    function bunnyInteract(type) {
+        if (type === 'feed') {
+            if (carrots > 0) {
+                updateCarrots(-1);
+                face.classList.add('eat-anim');
+                speak("يم يمي! هذا الجزر لذيذ جداً، شكراً لك!", '😋');
+                setTimeout(() => face.classList.remove('eat-anim'), 1000);
+            } else {
+                speak("أوه، ليس لدي جزر.. العب بعض الألعاب لتحصل عليه!", '😢');
+            }
+        } 
+        else if (type === 'joke') {
+            body.className = 'p-4 bg-happy';
+            const jokes = [
+                "مرة أرنب اشترى ساعة، لقى كل وقتها قرمشة!",
+                "ليه الأرنب بيحب الجزر؟ عشان مبيحبش البيتزا!",
+                "أنا أسرع أرنب في العالم، بس لما بكون نايم!"
+            ];
+            speak(jokes[Math.floor(Math.random()*jokes.length)], '😂');
+        }
+        else if (type === 'lesson') {
+            const lessons = [
+                "هل تعلم أن أسنان الأرنب لا تتوقف عن النمو أبداً؟",
+                "الأرانب يمكنها الرؤية خلفها دون أن تلتفت!",
+                "هل تعلم أنني أحب الأذكياء الذين يغسلون أيديهم؟"
+            ];
+            speak(lessons[Math.floor(Math.random()*lessons.length)], '🧐');
+        }
+        else if (type === 'dance') {
+            face.style.animation = 'spin 0.5s infinite linear';
+            speak("أنا أرقص لأنني سعيد بصداقتك!", '🥳');
+            setTimeout(() => face.style.animation = '', 2000);
+        }
+    }
+
+    function petBunny() {
+        // تأثير القلوب
+        const heart = document.createElement('div');
+        heart.innerText = '❤️';
+        heart.style.position = 'fixed';
+        heart.style.left = event.clientX + 'px';
+        heart.style.top = event.clientY + 'px';
+        heart.style.fontSize = '30px';
+        heart.style.animation = 'float 1s forwards';
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 1000);
+        
+        speak("هذا يشعرني بالأمان، أنت صديق طيب!", '🥰');
+    }
+
+    // صوت ترحيبي عند الفتح
+    window.onload = () => {
+        setTimeout(() => speak("أهلاً بك يا صديقي، أنا أرنوب.. هل نلعب معاً؟", '👋'), 500);
+    };
+  </script>
+
+  <style>
+    @keyframes spin { from {transform:rotate(0)} to {transform:rotate(360deg)} }
+  </style>
+</body>
+</html>

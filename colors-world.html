@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>عالم الألوان السحري 🌈</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      transition: background-color 0.8s ease;
+      background-color: #f8fafc;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .color-blob {
+      width: 150px;
+      height: 150px;
+      border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      animation: blobAnim 6s linear infinite;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+    @keyframes blobAnim {
+      0%, 100% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; transform: scale(1); }
+      33% { border-radius: 60% 40% 30% 70% / 50% 30% 70% 50%; transform: scale(1.05); }
+      66% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 40%; transform: scale(0.95); }
+    }
+
+    .color-blob:hover {
+      transform: scale(1.2) rotate(10deg);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+
+    .white-text { color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+  </style>
+</head>
+<body class="p-4 md:p-8">
+
+  <nav class="max-w-6xl mx-auto flex justify-between items-center mb-12">
+    <a href="roadmap.html" class="bg-white/90 backdrop-blur px-8 py-3 rounded-2xl font-bold shadow-lg text-gray-800 hover:scale-105 transition-all">العودة للخريطة 🏠</a>
+    <div id="status-box" class="bg-white/90 px-6 py-3 rounded-2xl shadow-md border-b-4 border-gray-200">
+      <span class="text-2xl font-black text-gray-700">اضغط على لون! ✨</span>
+    </div>
+  </nav>
+
+  <div id="colors-grid" class="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-12 justify-items-center">
+    </div>
+
+  <script>
+    const colors = [
+      { name: 'أحمر', hex: '#ef4444', audio: 'Red' },
+      { name: 'أزرق', hex: '#3b82f6', audio: 'Blue' },
+      { name: 'أخضر', hex: '#22c55e', audio: 'Green' },
+      { name: 'أصفر', hex: '#eab308', audio: 'Yellow' },
+      { name: 'برتقالي', hex: '#f97316', audio: 'Orange' },
+      { name: 'وردي', hex: '#ec4899', audio: 'Pink' },
+      { name: 'بنفسجي', hex: '#a855f7', audio: 'Purple' },
+      { name: 'بني', hex: '#713f12', audio: 'Brown' }
+    ];
+
+    const grid = document.getElementById('colors-grid');
+    const clickedColors = new Set();
+
+    colors.forEach(color => {
+      const blob = document.createElement('div');
+      blob.className = 'color-blob';
+      blob.style.backgroundColor = color.hex;
+      blob.innerHTML = `<span class="text-2xl font-black white-text">${color.name}</span>`;
+      
+      blob.onclick = () => {
+        document.body.style.backgroundColor = color.hex + '33'; // شفافية خفيفة للخلفية
+        playColor(color.name);
+        
+        // تحديث الصندوق العلوي
+        const statusBox = document.getElementById('status-box');
+        statusBox.style.borderColor = color.hex;
+        statusBox.innerHTML = `<span class="text-2xl font-black" style="color: ${color.hex}">هذا هو اللون الـ ${color.name}! 🎨</span>`;
+
+        clickedColors.add(color.name);
+        if (clickedColors.size === colors.length) {
+          giveStar();
+        }
+      };
+
+      grid.appendChild(blob);
+    });
+
+    function playColor(name) {
+      window.speechSynthesis.cancel();
+      const msg = new SpeechSynthesisUtterance(name);
+      msg.lang = 'ar-SA';
+      msg.rate = 0.9;
+      window.speechSynthesis.speak(msg);
+    }
+
+    function giveStar() {
+      const appData = JSON.parse(localStorage.getItem('gameProgress') || '{"stars":0}');
+      appData.stars += 1;
+      localStorage.setItem('gameProgress', JSON.stringify(appData));
+      
+      setTimeout(() => {
+        const winMsg = new SpeechSynthesisUtterance("رائع! لقد عرفت كل الألوان، حصلت على نجمة!");
+        winMsg.lang = 'ar-SA';
+        window.speechSynthesis.speak(winMsg);
+        alert("🌈 بطل الألوان! حصلت على نجمة ⭐");
+      }, 500);
+    }
+
+    window.onload = () => {
+      const welcome = new SpeechSynthesisUtterance("أهلاً بك في عالم الألوان، اختر لونك المفضل!");
+      welcome.lang = 'ar-SA';
+      window.speechSynthesis.speak(welcome);
+    };
+  </script>
+</body>
+</html>
